@@ -177,17 +177,17 @@ class HpeIlo extends IPSModule {
 		//print_r($resultChassisObject);
 		SetValue($this->GetIDForIdent("SystemHealth") , $resultObject->Status->Health);
 		
-		$switch ($resultObject->Status->State) {
+		switch ($resultObject->Status->State) {
 			
-				case "Disabled":
-					SetValue($this->GetIDForIdent("Status") , "Off");
-					break;
-				case "Enabled":
-					SetValue($this->GetIDForIdent("Status") , "On");
-					break;
-				default:
-					SetValue($this->GetIDForIdent("Status") , $resultObject->Status->State);
-					break;
+			case "Disabled":
+				SetValue($this->GetIDForIdent("Status") , "Off");
+				break;
+			case "Enabled":
+				SetValue($this->GetIDForIdent("Status") , "On");
+				break;
+			default:
+				SetValue($this->GetIDForIdent("Status") , $resultObject->Status->State);
+				break;
 		}
 	}
 

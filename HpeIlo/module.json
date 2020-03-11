@@ -1,0 +1,14 @@
+{
+  "id": "{ee8cc826-b44d-423e-8ebe-3de4d3bacce4}",
+  "name": "HpeIlo",
+  "type": 3,
+  "vendor": "Andreas Seemueller",
+  "aliases": 
+  [
+	  "HpeIlo"
+  ],
+  "parentRequirements": [],
+  "childRequirements": [],
+  "implemented": [],
+  "prefix": "HPEILO"
+}

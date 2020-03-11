@@ -105,7 +105,7 @@ class HpeIlo extends IPSModule {
 		
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
 		$dataJson = '{"ResetType": "PushPowerButton"}';
-		$resultObjectReset = CallAPI("POST", $url, $dataJson);
+		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
 	}
 
 	public function RequestAction($Ident, $Value) {

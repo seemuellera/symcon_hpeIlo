@@ -25,10 +25,19 @@ class HpeIlo extends IPSModule {
 		$this->RegisterPropertyString("hostname","");
 		$this->RegisterPropertyString("username","");
 		$this->RegisterPropertyString("password","");
+		
+		// Variable profiles
+		$variableProfileHealthState = "HPEILO.HealthState";
+		if (! IPS_VariableProfileExists($variableProfileHealthState) ) {
+			
+			IPS_CreateVariableProfile($variableProfileHealthState, 3);
+			IPS_SetVariableProfileIcon($variableProfileHealthState, "Help");
+			IPS_SetVariableProfileAssociation($variableProfileHealthState, "OK", "Healthy", "", "#00FF00");
+		}
 
 		// Variables
 		$this->RegisterVariableString("Status","Status");
-		$this->RegisterVariableString("SystemHealth","System Health");
+		$this->RegisterVariableString("SystemHealth","System Health",$variableProfileHealthState);
 		$this->RegisterVariableFloat("TemperatureInlet","Temperature - Inlet","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu1","Temperature - CPU 1","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu2","Temperature - CPU 2","~Temperature");
@@ -37,8 +46,8 @@ class HpeIlo extends IPSModule {
 		$this->RegisterVariableFloat("TemperaturePs2","Temperature - Power Supply 2","~Temperature");
 		$this->RegisterVariableFloat("TemperatureSystemBoard","Temperature - System Board","~Temperature");
 		$this->RegisterVariableFloat("PowerConsumption","Power Consumption","~Watt.3680");
-		$this->RegisterVariableString("PowerSupply1Health","Power Supply 1 Health");
-		$this->RegisterVariableString("PowerSupply2Health","Power Supply 2 Health");
+		$this->RegisterVariableString("PowerSupply1Health","Power Supply 1 Health", $variableProfileHealthState);
+		$this->RegisterVariableString("PowerSupply2Health","Power Supply 2 Health", $variableProfileHealthState);
 		
 
 		// Default Actions
@@ -259,5 +268,6 @@ class HpeIlo extends IPSModule {
 		SetValue($this->GetIDForIdent("PowerSupply1Health") , $resultObject->PowerSupplies[0]->Status->Health);
 		SetValue($this->GetIDForIdent("PowerSupply2Health") , $resultObject->PowerSupplies[1]->Status->Health);
 	}
+	
 }
 ?>

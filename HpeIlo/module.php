@@ -180,10 +180,9 @@ class HpeIlo extends IPSModule {
 		$result = $this->CallAPI("GET",$url);
 
 		$resultObject = json_decode($result);
-		//print_r($resultChassisObject);
-		SetValue($this->GetIDForIdent("SystemHealth") , $resultObject->Status->Health);
+		//print_r($resultChassisObject)
 		
-		foreach ($resultThermalObject->Temperatures as $currentSensor) {
+		foreach ($resultObject->Temperatures as $currentSensor) {
 
 			switch ($currentSensor->Name) {
 				case "01-Inlet Ambient":

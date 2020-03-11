@@ -36,6 +36,9 @@ class HpeIlo extends IPSModule {
 		$this->RegisterVariableFloat("TemperaturePs1","Temperature - Power Supply 1","~Temperature");
 		$this->RegisterVariableFloat("TemperaturePs2","Temperature - Power Supply 2","~Temperature");
 		$this->RegisterVariableFloat("TemperatureSystemBoard","Temperature - System Board","~Temperature");
+		$this->RegisterVariableFloat("PowerConsumption","Power Consumption","~Watt.3680");
+		$this->RegisterVariableString("PowerSupplyHealth1","Power Supply 1 Health");
+		$this->RegisterVariableString("PowerSupplyHealth1","Power Supply 2 Health");
 		
 
 		// Default Actions
@@ -98,6 +101,7 @@ class HpeIlo extends IPSModule {
 		IPS_LogMessage($_IPS['SELF'],"HPEILO - Refresh in progress");
 		$this->updateSystemHealth();
 		$this->updateThermalData();
+		$this->updatePowerInformation();
 	}
 
 	public function RequestAction($Ident, $Value) {
@@ -208,6 +212,18 @@ class HpeIlo extends IPSModule {
 					break;
 			}
 		}
+	}
+	
+	protected function updatePowerInformation() {
+		
+		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Power";
+		$result = $this->CallAPI("GET",$url);
+
+		$resultObject = json_decode($result);
+		//print_r($resultChassisObject);
+		SetValue($this->GetIDForIdent("PowerConsumption") , $resultObject->PowerConsumedWatts);
+		SetValue($this->GetIDForIdent("PowerSupplyHealth1") , $resultObject->PowerSupplies[0]->Status->Health);
+		SetValue($this->GetIDForIdent("PowerSupplyHealth2") , $resultObject->PowerSupplies[1]->Status->Health);
 	}
 }
 ?>

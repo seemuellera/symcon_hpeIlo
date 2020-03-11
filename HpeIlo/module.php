@@ -89,7 +89,7 @@ class HpeIlo extends IPSModule {
 	public function RefreshInformation() {
 
 		IPS_LogMessage($_IPS['SELF'],"HPEILO - Refresh in progress");
-		updateSystemHealth();
+		$this->updateSystemHealth();
 	}
 
 	public function RequestAction($Ident, $Value) {

@@ -159,7 +159,7 @@ class HpeIlo extends IPSModule {
 	protected function updateSystemHealth() {
 		
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1";
-		$result = CallAPI("GET",$url);
+		$result = $this->CallAPI("GET",$url);
 
 		$resultObject = json_decode($resultChassis);
 		//print_r($resultChassisObject);

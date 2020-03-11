@@ -27,7 +27,7 @@ class HpeIlo extends IPSModule {
 		$this->RegisterPropertyString("password","");
 
 		// Variables
-		// $this->RegisterVariableBoolean("Status","Status","~Switch");
+		$this->RegisterVariableString("Status","Status");
 		$this->RegisterVariableString("SystemHealth","System Health");
 		$this->RegisterVariableFloat("TemperatureInlet","Temperature - Inlet","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu1","Temperature - CPU 1","~Temperature");
@@ -176,6 +176,7 @@ class HpeIlo extends IPSModule {
 		$resultObject = json_decode($result);
 		//print_r($resultChassisObject);
 		SetValue($this->GetIDForIdent("SystemHealth") , $resultObject->Status->Health);
+		SetValue($this->GetIDForIdent("Status") , $resultObject->Status->State);
 	}
 
 	protected function updateThermalData() {

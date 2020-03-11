@@ -37,8 +37,8 @@ class HpeIlo extends IPSModule {
 		$this->RegisterVariableFloat("TemperaturePs2","Temperature - Power Supply 2","~Temperature");
 		$this->RegisterVariableFloat("TemperatureSystemBoard","Temperature - System Board","~Temperature");
 		$this->RegisterVariableFloat("PowerConsumption","Power Consumption","~Watt.3680");
-		$this->RegisterVariableString("PowerSupplyHealth1","Power Supply 1 Health");
-		$this->RegisterVariableString("PowerSupplyHealth1","Power Supply 2 Health");
+		$this->RegisterVariableString("PowerSupply1Health","Power Supply 1 Health");
+		$this->RegisterVariableString("PowerSupply2Health","Power Supply 2 Health");
 		
 
 		// Default Actions
@@ -222,8 +222,8 @@ class HpeIlo extends IPSModule {
 		$resultObject = json_decode($result);
 		//print_r($resultChassisObject);
 		SetValue($this->GetIDForIdent("PowerConsumption") , $resultObject->PowerConsumedWatts);
-		SetValue($this->GetIDForIdent("PowerSupplyHealth1") , $resultObject->PowerSupplies[0]->Status->Health);
-		SetValue($this->GetIDForIdent("PowerSupplyHealth2") , $resultObject->PowerSupplies[1]->Status->Health);
+		SetValue($this->GetIDForIdent("PowerSupply1Health") , $resultObject->PowerSupplies[0]->Status->Health);
+		SetValue($this->GetIDForIdent("PowerSupply2Health") , $resultObject->PowerSupplies[1]->Status->Health);
 	}
 }
 ?>

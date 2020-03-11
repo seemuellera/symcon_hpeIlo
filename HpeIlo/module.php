@@ -86,10 +86,7 @@ class HpeIlo extends IPSModule {
 
 		// Add the buttons for the test center
 		$form['actions'][] = Array("type" => "Button", "label" => "Refresh Overall Status", "onClick" => 'HPEILO_RefreshInformation($id);');
-		/*
-		$form['actions'][] = Array("type" => "Button", "label" => "Switch On", "onClick" => 'METASWITCH_SwitchOn($id);');
-		$form['actions'][] = Array("type" => "Button", "label" => "Switch Off", "onClick" => 'METASWITCH_SwitchOff($id);');
-		*/
+		$form['actions'][] = Array("type" => "Button", "label" => "Press Power Button", "onClick" => 'HPEILO_PressPowerButton($id);');
 
 		// Return the completed form
 		return json_encode($form);
@@ -102,6 +99,13 @@ class HpeIlo extends IPSModule {
 		$this->updateSystemHealth();
 		$this->updateThermalData();
 		$this->updatePowerInformation();
+	}
+	
+	public function PressPowerButton() {
+		
+		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
+		$dataJson = '{"ResetType": "PushPowerButton"}';
+		$resultObjectReset = CallAPI("POST", $url, $dataJson);
 	}
 
 	public function RequestAction($Ident, $Value) {
@@ -138,6 +142,7 @@ class HpeIlo extends IPSModule {
 		{
 			case "POST":
 				curl_setopt($curl, CURLOPT_POST, 1);
+				curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
 
 				if ($data)
 					curl_setopt($curl, CURLOPT_POSTFIELDS, $data);

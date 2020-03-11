@@ -29,15 +29,18 @@ class HpeIlo extends IPSModule {
 		// Variable profiles
 		$variableProfileHealthState = "HPEILO.HealthState";
 		if (! IPS_VariableProfileExists($variableProfileHealthState) ) {
-			
-			IPS_CreateVariableProfile($variableProfileHealthState, 3);
-			IPS_SetVariableProfileIcon($variableProfileHealthState, "Help");
-			IPS_SetVariableProfileAssociation($variableProfileHealthState, "OK", "Healthy", "", "#00FF00");
+		
+			IPS_DeleteVariableProfile($variableProfileHealthState);
 		}
+			
+		IPS_CreateVariableProfile($variableProfileHealthState, 0);
+		IPS_SetVariableProfileIcon($variableProfileHealthState, "Help");
+		// IPS_SetVariableProfileAssociation($variableProfileHealthState, "OK", "Healthy", "", "#00FF00");
+	
 
 		// Variables
 		$this->RegisterVariableString("Status","Status");
-		$this->RegisterVariableString("SystemHealth","System Health",$variableProfileHealthState);
+		$this->RegisterVariableBoolean("SystemHealth","System Health",$variableProfileHealthState);
 		$this->RegisterVariableFloat("TemperatureInlet","Temperature - Inlet","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu1","Temperature - CPU 1","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu2","Temperature - CPU 2","~Temperature");
@@ -46,8 +49,8 @@ class HpeIlo extends IPSModule {
 		$this->RegisterVariableFloat("TemperaturePs2","Temperature - Power Supply 2","~Temperature");
 		$this->RegisterVariableFloat("TemperatureSystemBoard","Temperature - System Board","~Temperature");
 		$this->RegisterVariableFloat("PowerConsumption","Power Consumption","~Watt.3680");
-		$this->RegisterVariableString("PowerSupply1Health","Power Supply 1 Health", $variableProfileHealthState);
-		$this->RegisterVariableString("PowerSupply2Health","Power Supply 2 Health", $variableProfileHealthState);
+		$this->RegisterVariableBoolean("PowerSupply1Health","Power Supply 1 Health", $variableProfileHealthState);
+		$this->RegisterVariableBoolean("PowerSupply2Health","Power Supply 2 Health", $variableProfileHealthState);
 		
 
 		// Default Actions
@@ -205,7 +208,15 @@ class HpeIlo extends IPSModule {
 
 		$resultObject = json_decode($result);
 		//print_r($resultChassisObject);
-		SetValue($this->GetIDForIdent("SystemHealth") , $resultObject->Status->Health);
+		
+		if ($resultObject->Status->Health == "OK") {
+			
+			SetValue($this->GetIDForIdent("SystemHealth"), true);
+		}
+		else {
+			
+			SetValue($this->GetIDForIdent("SystemHealth"), false);
+		}
 		
 		switch ($resultObject->Status->State) {
 			
@@ -265,8 +276,24 @@ class HpeIlo extends IPSModule {
 		$resultObject = json_decode($result);
 		//print_r($resultChassisObject);
 		SetValue($this->GetIDForIdent("PowerConsumption") , $resultObject->PowerConsumedWatts);
-		SetValue($this->GetIDForIdent("PowerSupply1Health") , $resultObject->PowerSupplies[0]->Status->Health);
-		SetValue($this->GetIDForIdent("PowerSupply2Health") , $resultObject->PowerSupplies[1]->Status->Health);
+		
+		if ($resultObject->PowerSupplies[0]->Status->Health == "OK") {
+			
+			SetValue($this->GetIDForIdent("PowerSupply1Health"), true);
+		}
+		else {
+			
+			SetValue($this->GetIDForIdent("PowerSupply1Health"), false);
+		}
+		
+		if ($resultObject->PowerSupplies[1]->Status->Health == "OK") {
+			
+			SetValue($this->GetIDForIdent("PowerSupply2Health"), true);
+		}
+		else {
+			
+			SetValue($this->GetIDForIdent("PowerSupply2Health"), false);
+		}
 	}
 	
 }

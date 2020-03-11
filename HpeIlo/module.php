@@ -31,16 +31,27 @@ class HpeIlo extends IPSModule {
 		if (IPS_VariableProfileExists($variableProfileHealthState) ) {
 		
 			IPS_DeleteVariableProfile($variableProfileHealthState);
-		}
-			
+		}			
 		IPS_CreateVariableProfile($variableProfileHealthState, 0);
 		IPS_SetVariableProfileIcon($variableProfileHealthState, "Help");
 		IPS_SetVariableProfileAssociation($variableProfileHealthState, 1, "Healthy", "", 0x00FF00);
 		IPS_SetVariableProfileAssociation($variableProfileHealthState, 0, "Unhealthy", "", 0xFF0000);
 	
 
+		$variableProfileHealthState = "HPEILO.PowerState";
+		if (IPS_VariableProfileExists($variableProfileHealthState) ) {
+		
+			IPS_DeleteVariableProfile($variableProfileHealthState);
+		}			
+		IPS_CreateVariableProfile($variableProfileHealthState, 0);
+		IPS_SetVariableProfileIcon($variableProfileHealthState, "Electricity");
+		IPS_SetVariableProfileAssociation($variableProfileHealthState, 2, "On", "", 0x00FF00);
+		IPS_SetVariableProfileAssociation($variableProfileHealthState, 1, "Starting", "", 0x80FF80);
+		IPS_SetVariableProfileAssociation($variableProfileHealthState, 0, "Off", "", 0xC0C0C0);
+	
+
 		// Variables
-		$this->RegisterVariableString("Status","Status");
+		$this->RegisterVariableInteger("Status","Status");
 		$this->RegisterVariableBoolean("SystemHealth","System Health",$variableProfileHealthState);
 		$this->RegisterVariableFloat("TemperatureInlet","Temperature - Inlet","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu1","Temperature - CPU 1","~Temperature");
@@ -222,13 +233,17 @@ class HpeIlo extends IPSModule {
 		switch ($resultObject->Status->State) {
 			
 			case "Disabled":
-				SetValue($this->GetIDForIdent("Status") , "Off");
+				SetValue($this->GetIDForIdent("Status") , 0);
 				break;
 			case "Enabled":
-				SetValue($this->GetIDForIdent("Status") , "On");
+				SetValue($this->GetIDForIdent("Status") , 2);
+				break;
+			case "Starting":
+				SetValue($this->GetIDForIdent("Status") , 1);
 				break;
 			default:
-				SetValue($this->GetIDForIdent("Status") , $resultObject->Status->State);
+				SetValue($this->GetIDForIdent("Status") , 4);
+				IPS_LogMessage($_IPS['SELF'],"HPEILO - Received unknow power status of " . $resultObject->Status->State);
 				break;
 		}
 	}

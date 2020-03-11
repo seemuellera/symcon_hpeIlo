@@ -63,12 +63,15 @@ class HpeIlo extends IPSModule {
         	
 		// Initialize the form
 		$form = Array(
-            		"elements" => Array(),
-			"actions" => Array()
-        		);
+            	"elements" => Array(),
+				"actions" => Array()
+        	);
 
 		// Add the Elements
 		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "RefreshInterval", "caption" => "Refresh Interval");
+		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "hostname", "caption" => "Hostname or IP address");
+		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "username", "caption" => "Username");
+		$form['elements'][] = Array("type" => "PasswordTextBox", "name" => "password", "caption" => "Password");
 		
 
 		// Add the buttons for the test center
@@ -113,6 +116,44 @@ class HpeIlo extends IPSModule {
 				throw new Exception("Invalid Ident");
 			*/
 		}
+	}
+	
+	protected function CallAPI($method, $url, $data = false) {
+    
+		$curl = curl_init();
+
+		switch ($method)
+		{
+			case "POST":
+				curl_setopt($curl, CURLOPT_POST, 1);
+
+				if ($data)
+					curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+				break;
+			case "PUT":
+				curl_setopt($curl, CURLOPT_PUT, 1);
+				break;
+			default:
+				if ($data)
+					$url = sprintf("%s?%s", $url, http_build_query($data));
+		}
+
+		// Optional Authentication:
+		curl_setopt($curl, CURLOPT_VERBOSE, TRUE);
+
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+		curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+		curl_setopt($curl, CURLOPT_USERPWD, $this->ReadPropertyString("username") . ":" . $this->ReadPropertyString("password") );
+
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+		$result = curl_exec($curl);
+
+		curl_close($curl);
+
+		return $result;
 	}
 
 }

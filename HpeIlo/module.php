@@ -89,7 +89,7 @@ class HpeIlo extends IPSModule {
 	public function RefreshInformation() {
 
 		IPS_LogMessage($_IPS['SELF'],"HPEILO - Refresh in progress");
-
+		updateSystemHealth();
 	}
 
 	public function RequestAction($Ident, $Value) {
@@ -154,6 +154,16 @@ class HpeIlo extends IPSModule {
 		curl_close($curl);
 
 		return $result;
+	}
+	
+	protected function updateSystemHealth() {
+		
+		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1";
+		$result = CallAPI("GET",$url);
+
+		$resultObject = json_decode($resultChassis);
+		//print_r($resultChassisObject);
+		SetValueIfNeeded($this->GetIDForIdent("SystemHealth") , $resultChassisObject->Status->Health);
 	}
 
 }

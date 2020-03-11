@@ -163,7 +163,7 @@ class HpeIlo extends IPSModule {
 
 		$resultObject = json_decode($resultChassis);
 		//print_r($resultChassisObject);
-		SetValueIfNeeded($this->GetIDForIdent("SystemHealth") , $resultChassisObject->Status->Health);
+		SetValueIfNeeded($this->GetIDForIdent("SystemHealth") , $resultObject->Status->Health);
 	}
 
 }

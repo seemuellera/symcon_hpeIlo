@@ -35,7 +35,8 @@ class HpeIlo extends IPSModule {
 			
 		IPS_CreateVariableProfile($variableProfileHealthState, 0);
 		IPS_SetVariableProfileIcon($variableProfileHealthState, "Help");
-		// IPS_SetVariableProfileAssociation($variableProfileHealthState, "OK", "Healthy", "", "#00FF00");
+		IPS_SetVariableProfileAssociation($variableProfileHealthState, 1, "Healthy", "", "#00FF00");
+		IPS_SetVariableProfileAssociation($variableProfileHealthState, 0, "Unhealthy", "", "#FF0000");
 	
 
 		// Variables

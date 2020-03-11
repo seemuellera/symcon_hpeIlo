@@ -38,20 +38,20 @@ class HpeIlo extends IPSModule {
 		IPS_SetVariableProfileAssociation($variableProfileHealthState, 0, "Unhealthy", "", 0xFF0000);
 	
 
-		$variableProfileHealthState = "HPEILO.PowerState";
-		if (IPS_VariableProfileExists($variableProfileHealthState) ) {
+		$variableProfilePowerState = "HPEILO.PowerState";
+		if (IPS_VariableProfileExists($variableProfilePowerState) ) {
 		
-			IPS_DeleteVariableProfile($variableProfileHealthState);
+			IPS_DeleteVariableProfile($variableProfilePowerState);
 		}			
-		IPS_CreateVariableProfile($variableProfileHealthState, 0);
-		IPS_SetVariableProfileIcon($variableProfileHealthState, "Electricity");
-		IPS_SetVariableProfileAssociation($variableProfileHealthState, 2, "On", "", 0x00FF00);
-		IPS_SetVariableProfileAssociation($variableProfileHealthState, 1, "Starting", "", 0x80FF80);
-		IPS_SetVariableProfileAssociation($variableProfileHealthState, 0, "Off", "", 0xC0C0C0);
+		IPS_CreateVariableProfile($variableProfilePowerState, 0);
+		IPS_SetVariableProfileIcon($variableProfilePowerState, "Electricity");
+		IPS_SetVariableProfileAssociation($variableProfilePowerState, 2, "On", "", 0x00FF00);
+		IPS_SetVariableProfileAssociation($variableProfilePowerState, 1, "Starting", "", 0x80FF80);
+		IPS_SetVariableProfileAssociation($variableProfilePowerState, 0, "Off", "", 0xC0C0C0);
 	
 
 		// Variables
-		$this->RegisterVariableInteger("Status","Status");
+		$this->RegisterVariableInteger("Status","Status", $variableProfilePowerState);
 		$this->RegisterVariableBoolean("SystemHealth","System Health",$variableProfileHealthState);
 		$this->RegisterVariableFloat("TemperatureInlet","Temperature - Inlet","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu1","Temperature - CPU 1","~Temperature");

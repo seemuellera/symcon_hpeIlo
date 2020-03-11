@@ -32,7 +32,7 @@ class HpeIlo extends IPSModule {
 		
 
 		// Default Actions
-		$this->EnableAction("Status");
+		// $this->EnableAction("Status");
 
 		// Timer
 		$this->RegisterTimer("RefreshInformation", 0 , 'HPEILO_RefreshInformation($_IPS[\'TARGET\']);');

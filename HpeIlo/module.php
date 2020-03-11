@@ -87,6 +87,8 @@ class HpeIlo extends IPSModule {
 		// Add the buttons for the test center
 		$form['actions'][] = Array("type" => "Button", "label" => "Refresh Overall Status", "onClick" => 'HPEILO_RefreshInformation($id);');
 		$form['actions'][] = Array("type" => "Button", "label" => "Press Power Button", "onClick" => 'HPEILO_PressPowerButton($id);');
+		$form['actions'][] = Array("type" => "Button", "label" => "Force Power Off", "onClick" => 'HPEILO_ForcePowerOff($id);');
+		$form['actions'][] = Array("type" => "Button", "label" => "Force Power On", "onClick" => 'HPEILO_ForcePowerOn($id);');
 
 		// Return the completed form
 		return json_encode($form);
@@ -105,6 +107,20 @@ class HpeIlo extends IPSModule {
 		
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
 		$dataJson = '{"ResetType": "PushPowerButton"}';
+		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
+	}
+
+	public function ForcePowerOff() {
+		
+		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
+		$dataJson = '{"ResetType": "ForceOff"}';
+		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
+	}
+	
+	public function ForcePowerOn() {
+		
+		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
+		$dataJson = '{"ResetType": "On"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
 	}
 

@@ -28,7 +28,7 @@ class HpeIlo extends IPSModule {
 		
 		// Variable profiles
 		$variableProfileHealthState = "HPEILO.HealthState";
-		if (! IPS_VariableProfileExists($variableProfileHealthState) ) {
+		if (IPS_VariableProfileExists($variableProfileHealthState) ) {
 		
 			IPS_DeleteVariableProfile($variableProfileHealthState);
 		}

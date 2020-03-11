@@ -43,7 +43,7 @@ class HpeIlo extends IPSModule {
 		
 			IPS_DeleteVariableProfile($variableProfilePowerState);
 		}			
-		IPS_CreateVariableProfile($variableProfilePowerState, 0);
+		IPS_CreateVariableProfile($variableProfilePowerState, 1);
 		IPS_SetVariableProfileIcon($variableProfilePowerState, "Electricity");
 		IPS_SetVariableProfileAssociation($variableProfilePowerState, 2, "On", "", 0x00FF00);
 		IPS_SetVariableProfileAssociation($variableProfilePowerState, 1, "Starting", "", 0x80FF80);

@@ -161,7 +161,7 @@ class HpeIlo extends IPSModule {
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1";
 		$result = $this->CallAPI("GET",$url);
 
-		$resultObject = json_decode($resultChassis);
+		$resultObject = json_decode($result);
 		//print_r($resultChassisObject);
 		SetValueIfNeeded($this->GetIDForIdent("SystemHealth") , $resultObject->Status->Health);
 	}

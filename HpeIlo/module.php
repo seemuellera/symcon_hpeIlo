@@ -132,6 +132,9 @@ class HpeIlo extends IPSModule {
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
 		$dataJson = '{"ResetType": "PushPowerButton"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
+		
+		sleep(3);
+		$this->RefreshInformation();
 	}
 
 	public function ForcePowerOff() {
@@ -139,6 +142,9 @@ class HpeIlo extends IPSModule {
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
 		$dataJson = '{"ResetType": "ForceOff"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
+		
+		sleep(3);
+		$this->RefreshInformation();
 	}
 	
 	public function ForcePowerOn() {
@@ -146,6 +152,9 @@ class HpeIlo extends IPSModule {
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
 		$dataJson = '{"ResetType": "On"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
+		
+		sleep(3);
+		$this->RefreshInformation();
 	}
 
 	public function RequestAction($Ident, $Value) {

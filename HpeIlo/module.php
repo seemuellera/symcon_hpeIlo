@@ -153,16 +153,16 @@ class HpeIlo extends IPSModule {
 	
 		switch ($Ident) {
 		
-			/*
+			
 			case "Status":
 				// Default Action for Status Variable
 				if ($Value) {
 				
-					$this->SwitchOn();
+					$this->PressPowerButton();
 				}
 				else {
 				
-					$this->SwitchOff();
+					$this->PressPowerButton();
 				}
 
 				// Neuen Wert in die Statusvariable schreiben
@@ -170,7 +170,7 @@ class HpeIlo extends IPSModule {
 				break;
 			default:
 				throw new Exception("Invalid Ident");
-			*/
+			
 		}
 	}
 	

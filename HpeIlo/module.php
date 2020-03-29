@@ -38,20 +38,8 @@ class HpeIlo extends IPSModule {
 		IPS_SetVariableProfileAssociation($variableProfileHealthState, 0, "Unhealthy", "", 0xFF0000);
 	
 
-		$variableProfilePowerState = "HPEILO.PowerState";
-		if (IPS_VariableProfileExists($variableProfilePowerState) ) {
-		
-			IPS_DeleteVariableProfile($variableProfilePowerState);
-		}			
-		IPS_CreateVariableProfile($variableProfilePowerState, 1);
-		IPS_SetVariableProfileIcon($variableProfilePowerState, "Electricity");
-		IPS_SetVariableProfileAssociation($variableProfilePowerState, 2, "On", "", 0x00FF00);
-		IPS_SetVariableProfileAssociation($variableProfilePowerState, 1, "Starting", "", 0x80FF80);
-		IPS_SetVariableProfileAssociation($variableProfilePowerState, 0, "Off", "", 0xC0C0C0);
-	
-
 		// Variables
-		$this->RegisterVariableInteger("Status","Status", $variableProfilePowerState);
+		$this->RegisterVariableBoolean("Status","Status", "~Switch");
 		$this->RegisterVariableBoolean("SystemHealth","System Health",$variableProfileHealthState);
 		$this->RegisterVariableFloat("TemperatureInlet","Temperature - Inlet","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu1","Temperature - CPU 1","~Temperature");
@@ -245,13 +233,13 @@ class HpeIlo extends IPSModule {
 				SetValue($this->GetIDForIdent("Status") , 0);
 				break;
 			case "Enabled":
-				SetValue($this->GetIDForIdent("Status") , 2);
+				SetValue($this->GetIDForIdent("Status") , 1);
 				break;
 			case "Starting":
 				SetValue($this->GetIDForIdent("Status") , 1);
 				break;
 			default:
-				SetValue($this->GetIDForIdent("Status") , 4);
+				SetValue($this->GetIDForIdent("Status") , 0);
 				IPS_LogMessage($_IPS['SELF'],"HPEILO - Received unknow power status of " . $resultObject->Status->State);
 				break;
 		}

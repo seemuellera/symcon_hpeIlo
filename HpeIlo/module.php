@@ -155,11 +155,28 @@ class HpeIlo extends IPSModule {
 				// Default Action for Status Variable
 				if ($Value) {
 				
-					$this->PressPowerButton();
+					// A powern on was requested but we only need to execute it when the system is already running
+					if (! GetValue($this->GetIDForIdent("Status"))) {
+				
+						IPS_LogMessage($_IPS['SELF'],"HPEILO - Switch on System was requested");
+						$this->PressPowerButton();
+					}
+					else {
+						
+						IPS_LogMessage($_IPS['SELF'],"HPEILO - Switch on System was requested but it is already running");
+					}
 				}
 				else {
 				
-					$this->PressPowerButton();
+					if (GetValue($this->GetIDForIdent("Status"))) {
+					
+						IPS_LogMessage($_IPS['SELF'],"HPEILO - Switch off System was requested");
+						$this->PressPowerButton();
+					}
+					else {
+						
+						IPS_LogMessage($_IPS['SELF'],"HPEILO - Switch off System was requested but it is already off");
+					}
 				}
 
 				// Neuen Wert in die Statusvariable schreiben

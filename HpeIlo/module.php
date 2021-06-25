@@ -40,6 +40,7 @@ class HpeIlo extends IPSModule {
 
 		// Variables
 		$this->RegisterVariableBoolean("Status","Status", "~Switch");
+		$this->RegisterVariableBoolean("IloCardReachable","ILO card reachable", "~Alert");
 		$this->RegisterVariableBoolean("SystemHealth","System Health",$variableProfileHealthState);
 		$this->RegisterVariableFloat("TemperatureInlet","Temperature - Inlet","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu1","Temperature - CPU 1","~Temperature");
@@ -109,7 +110,6 @@ class HpeIlo extends IPSModule {
 
 	public function RefreshInformation() {
 
-		// IPS_LogMessage($_IPS['SELF'],"HPEILO - Refresh in progress");
 		$this->updateSystemHealth();
 		$this->updateThermalData();
 		$this->updatePowerInformation();
@@ -121,6 +121,16 @@ class HpeIlo extends IPSModule {
 		$dataJson = '{"ResetType": "PushPowerButton"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
 		
+		if (! $resultObjectReset) {
+			
+			$this->updateIloReachable(false);
+			return;
+		}
+		else {
+			
+			$this->updateIloReachable(true);
+		}
+		
 		sleep(3);
 		$this->RefreshInformation();
 	}
@@ -131,6 +141,17 @@ class HpeIlo extends IPSModule {
 		$dataJson = '{"ResetType": "ForceOff"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
 		
+		if (! $resultObjectReset) {
+			
+			$this->updateIloReachable(false);
+			return;
+		}
+		else {
+			
+			$this->updateIloReachable(true);
+		}
+
+		
 		sleep(3);
 		$this->RefreshInformation();
 	}
@@ -140,6 +161,17 @@ class HpeIlo extends IPSModule {
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
 		$dataJson = '{"ResetType": "On"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
+		
+		if (! $resultObjectReset) {
+			
+			$this->updateIloReachable(false);
+			return;
+		}
+		else {
+			
+			$this->updateIloReachable(true);
+		}
+
 		
 		sleep(3);
 		$this->RefreshInformation();
@@ -158,24 +190,24 @@ class HpeIlo extends IPSModule {
 					// A powern on was requested but we only need to execute it when the system is already running
 					if (! GetValue($this->GetIDForIdent("Status"))) {
 				
-						IPS_LogMessage($_IPS['SELF'],"HPEILO - Switch on System was requested");
+						$this->LogMessage("Switch on System was requested");
 						$this->PressPowerButton();
 					}
 					else {
 						
-						IPS_LogMessage($_IPS['SELF'],"HPEILO - Switch on System was requested but it is already running");
+						$this->LogMessage("Switch on System was requested but it is already running");
 					}
 				}
 				else {
 				
 					if (GetValue($this->GetIDForIdent("Status"))) {
 					
-						IPS_LogMessage($_IPS['SELF'],"HPEILO - Switch off System was requested");
+						$this->LogMessage("Switch off System was requested");
 						$this->PressPowerButton();
 					}
 					else {
 						
-						IPS_LogMessage($_IPS['SELF'],"HPEILO - Switch off System was requested but it is already off");
+						$this->LogMessage("Switch off System was requested but it is already off");
 					}
 				}
 
@@ -186,6 +218,26 @@ class HpeIlo extends IPSModule {
 				throw new Exception("Invalid Ident");
 			
 		}
+	}
+	
+	// Version 1.0
+	protected function LogMessage($message, $severity = 'INFO') {
+		
+		$logMappings = Array();
+		// $logMappings['DEBUG'] 	= 10206; Deactivated the normal debug, because it is not active
+		$logMappings['DEBUG'] 	= 10201;
+		$logMappings['INFO']	= 10201;
+		$logMappings['NOTIFY']	= 10203;
+		$logMappings['WARN'] 	= 10204;
+		$logMappings['CRIT']	= 10205;
+		
+		if ( ($severity == 'DEBUG') && ($this->ReadPropertyBoolean('DebugOutput') == false )) {
+			
+			return;
+		}
+		
+		$messageComplete = $severity . " - " . $message;
+		parent::LogMessage($messageComplete, $logMappings[$severity]);
 	}
 	
 	protected function CallAPI($method, $url, $data = false) {
@@ -231,6 +283,16 @@ class HpeIlo extends IPSModule {
 		
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1";
 		$result = $this->CallAPI("GET",$url);
+		
+		if (! $result) {
+			
+			$this->updateIloReachable(false);
+			return;
+		}
+		else {
+			
+			$this->updateIloReachable(true);
+		}
 
 		$resultObject = json_decode($result);
 		//print_r($resultChassisObject);
@@ -257,7 +319,7 @@ class HpeIlo extends IPSModule {
 				break;
 			default:
 				SetValue($this->GetIDForIdent("Status") , 0);
-				IPS_LogMessage($_IPS['SELF'],"HPEILO - Received unknow power status of " . $resultObject->Status->State);
+				$this->LogMessage("Received unknow power status of " . $resultObject->Status->State, "CRIT");
 				break;
 		}
 	}
@@ -266,6 +328,16 @@ class HpeIlo extends IPSModule {
 		
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
 		$result = $this->CallAPI("GET",$url);
+		
+		if (! $result) {
+			
+			$this->updateIloReachable(false);
+			return;
+		}
+		else {
+			
+			$this->updateIloReachable(true);
+		}
 
 		$resultObject = json_decode($result);
 		//print_r($resultChassisObject)
@@ -302,6 +374,16 @@ class HpeIlo extends IPSModule {
 		
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Power";
 		$result = $this->CallAPI("GET",$url);
+		
+		if (! $result) {
+			
+			$this->updateIloReachable(false);
+			return;
+		}
+		else {
+			
+			$this->updateIloReachable(true);
+		}
 
 		$resultObject = json_decode($result);
 		//print_r($resultChassisObject);
@@ -323,6 +405,25 @@ class HpeIlo extends IPSModule {
 		else {
 			
 			SetValue($this->GetIDForIdent("PowerSupply2Health"), false);
+		}
+	}
+	
+	protected function updateIloReachable($newState) {
+		
+		if (GetValue($this->GetIDForIdent("IloCardReachable")) == $newState) {
+			
+			return;
+		}
+		
+		SetValue($this->GetIDForIdent("IloCardReachable"), $newValue);
+		
+		if ($newValue) {
+			
+			$this->LogMessage("ILO card is now reachable");
+		}
+		else { 
+		
+			$this->LogMessage("ILO card is now unreachable","WARN");
 		}
 	}
 	

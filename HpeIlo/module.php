@@ -415,9 +415,9 @@ class HpeIlo extends IPSModule {
 			return;
 		}
 		
-		SetValue($this->GetIDForIdent("IloCardReachable"), $newValue);
+		SetValue($this->GetIDForIdent("IloCardReachable"), $newState);
 		
-		if ($newValue) {
+		if ($newState) {
 			
 			$this->LogMessage("ILO card is now reachable");
 		}

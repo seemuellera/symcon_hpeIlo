@@ -40,7 +40,7 @@ class HpeIlo extends IPSModule {
 
 		// Variables
 		$this->RegisterVariableBoolean("Status","Status", "~Switch");
-		$this->RegisterVariableBoolean("IloCardReachable","ILO card reachable", "~Alert");
+		$this->RegisterVariableBoolean("IloCardReachable","ILO card reachable", "~Alert.Reversed");
 		$this->RegisterVariableBoolean("SystemHealth","System Health",$variableProfileHealthState);
 		$this->RegisterVariableFloat("TemperatureInlet","Temperature - Inlet","~Temperature");
 		$this->RegisterVariableFloat("TemperatureCpu1","Temperature - CPU 1","~Temperature");

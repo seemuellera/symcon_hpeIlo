@@ -377,7 +377,7 @@ class HpeIlo extends IPSModule {
 					break;
 				case "13-Chipset":
 					SetValue($this->GetIDForIdent("TemperatureSystemBoard"), $currentSensor->CurrentReading);
-					break
+					break;
 			}
 		}
 	}

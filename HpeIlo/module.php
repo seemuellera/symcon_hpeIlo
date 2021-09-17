@@ -348,6 +348,9 @@ class HpeIlo extends IPSModule {
 				case "01-Inlet Ambient":
 					SetValue($this->GetIDForIdent("TemperatureInlet"), $currentSensor->CurrentReading);
 					break;
+				case "01-Front Ambient":
+					SetValue($this->GetIDForIdent("TemperatureInlet"), $currentSensor->CurrentReading);
+					break;
 				case "02-CPU 1":
 					SetValue($this->GetIDForIdent("TemperatureCpu1"), $currentSensor->CurrentReading);
 					break;
@@ -357,7 +360,13 @@ class HpeIlo extends IPSModule {
 				case "19-PS 1 Internal":
 					SetValue($this->GetIDForIdent("TemperaturePs1"), $currentSensor->CurrentReading);
 					break;
+				case "15-P/S 1":
+					SetValue($this->GetIDForIdent("TemperaturePs1"), $currentSensor->CurrentReading);
+					break;
 				case "20-PS 2 Internal":
+					SetValue($this->GetIDForIdent("TemperaturePs2"), $currentSensor->CurrentReading);
+					break;
+				case "16-P/S 2":
 					SetValue($this->GetIDForIdent("TemperaturePs2"), $currentSensor->CurrentReading);
 					break;
 				case "25-PCI 5 GPU":
@@ -366,6 +375,9 @@ class HpeIlo extends IPSModule {
 				case "10-Chipset":
 					SetValue($this->GetIDForIdent("TemperatureSystemBoard"), $currentSensor->CurrentReading);
 					break;
+				case "13-Chipset":
+					SetValue($this->GetIDForIdent("TemperatureSystemBoard"), $currentSensor->CurrentReading);
+					break
 			}
 		}
 	}

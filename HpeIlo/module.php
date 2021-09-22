@@ -25,6 +25,8 @@ class HpeIlo extends IPSModule {
 		$this->RegisterPropertyString("hostname","");
 		$this->RegisterPropertyString("username","");
 		$this->RegisterPropertyString("password","");
+		$this->RegisterPropertyBoolean("ignorePowerOn", false);
+		$this->RegisterPropertyBoolean("ignorePowerOff", false);
 		
 		// Variable profiles
 		$variableProfileHealthState = "HPEILO.HealthState";
@@ -95,6 +97,8 @@ class HpeIlo extends IPSModule {
 		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "hostname", "caption" => "Hostname or IP address");
 		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "username", "caption" => "Username");
 		$form['elements'][] = Array("type" => "PasswordTextBox", "name" => "password", "caption" => "Password");
+		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOn", "caption" => "Ignore Power On events via Status Action");
+		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOff", "caption" => "Ignore Power Off events via Status Action");
 		
 
 		// Add the buttons for the test center
@@ -191,11 +195,18 @@ class HpeIlo extends IPSModule {
 					if (! GetValue($this->GetIDForIdent("Status"))) {
 				
 						$this->LogMessage("Switch on System was requested");
-						$this->PressPowerButton();
+						if (! $this->ReadPropertyBoolean("ignorePowerOn") ) {
+							
+							$this->PressPowerButton();
+						}
+						else {
+							
+							$this->LogMessage("Power On event was ignored because property is set", "DEBUG");
+						}
 					}
 					else {
 						
-						$this->LogMessage("Switch on System was requested but it is already running");
+						$this->LogMessage("Switch On System was requested but it is already running", "DEBUG");
 					}
 				}
 				else {
@@ -203,7 +214,14 @@ class HpeIlo extends IPSModule {
 					if (GetValue($this->GetIDForIdent("Status"))) {
 					
 						$this->LogMessage("Switch off System was requested");
-						$this->PressPowerButton();
+						if (! $this->ReadPropertyBoolean("ignorePowerOff") ) {
+							
+							$this->PressPowerButton();
+						}
+						else {
+							
+							$this->LogMessage("Power Off event was ignored because property is set", "DEBUG");
+						}
 					}
 					else {
 						

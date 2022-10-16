@@ -88,6 +88,10 @@ class HpeIlo extends IPSModule {
 			$dummyModuleFansId = $this->CreateDummyModule("Fans");
 			$this->WriteAttributeInteger("DummyModuleFans", $dummyModuleFansId);
 		}
+		else {
+
+			$this->detectFans();
+		}
 
        	// Diese Zeile nicht löschen
        	parent::ApplyChanges();
@@ -361,6 +365,27 @@ class HpeIlo extends IPSModule {
 				SetValue($this->GetIDForIdent("Status") , 0);
 				$this->LogMessage("Received unknow power status of " . $resultObject->Status->State, "CRIT");
 				break;
+		}
+	}
+
+	protected function detectFans() {
+
+		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
+		$result = $this->CallAPI("GET",$url);
+
+		$resultObject = json_decode($result);
+
+		foreach ($resultObject->Fans as $currentFan) { 
+			
+			$displayNameHealth = $currentFan->FanName . " Health";
+			$identHealth = preg_replace('/\s+/','',$displayNameHealth);
+			$this->MaintainVariable($identHealth, $displayNameHealth, 0, "HPEILO.HealthState", 1, $true);
+			IPS_SetParent($this->GetIDForIdent($identHealth), $this->ReadAttributeInteger("DummyModuleFans"));
+
+			$displayNameSpeed = $currentFan->FanName . " Speed";
+			$identSpeed = preg_replace('/\s+/','',$displayNameSpeed);
+			$this->MaintainVariable($identSpeed, $displayNameSpeed, 1, "~Intensity.100", 2, $true);
+			IPS_SetParent($this->GetIDForIdent($identSpeed), $this->ReadAttributeInteger("DummyModuleFans"));
 		}
 	}
 

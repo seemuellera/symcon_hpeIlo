@@ -498,13 +498,16 @@ class HpeIlo extends IPSModule {
 			SetValue($this->GetIDForIdent("PowerSupply1Health"), false);
 		}
 		
-		if ($resultObject->PowerSupplies[1]->Status->Health == "OK") {
+		if (count($resultObject->PowerSupplies) == 2) {
 			
-			SetValue($this->GetIDForIdent("PowerSupply2Health"), true);
-		}
-		else {
-			
-			SetValue($this->GetIDForIdent("PowerSupply2Health"), false);
+			if ($resultObject->PowerSupplies[1]->Status->Health == "OK") {
+				
+				SetValue($this->GetIDForIdent("PowerSupply2Health"), true);
+			}
+			else {
+				
+				SetValue($this->GetIDForIdent("PowerSupply2Health"), false);
+			}
 		}
 	}
 	

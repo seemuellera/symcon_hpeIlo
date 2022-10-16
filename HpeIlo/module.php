@@ -380,12 +380,12 @@ class HpeIlo extends IPSModule {
 			
 			$displayNameHealth = $currentFan->FanName . " Health";
 			$identHealth = preg_replace('/\s+/','',$displayNameHealth);
-			$this->MaintainVariable($identHealth, $displayNameHealth, 0, "HPEILO.HealthState", 1, true);
+			@$this->MaintainVariable($identHealth, $displayNameHealth, 0, "HPEILO.HealthState", 1, true);
 			IPS_SetParent($this->GetIDForIdent($identHealth), $this->ReadAttributeInteger("DummyModuleFans"));
 
 			$displayNameSpeed = $currentFan->FanName . " Speed";
 			$identSpeed = preg_replace('/\s+/','',$displayNameSpeed);
-			$this->MaintainVariable($identSpeed, $displayNameSpeed, 1, "~Intensity.100", 2, true);
+			@$this->MaintainVariable($identSpeed, $displayNameSpeed, 1, "~Intensity.100", 2, true);
 			IPS_SetParent($this->GetIDForIdent($identSpeed), $this->ReadAttributeInteger("DummyModuleFans"));
 		}
 	}

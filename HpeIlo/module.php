@@ -140,6 +140,7 @@ class HpeIlo extends IPSModule {
 
 	public function RefreshInformation() {
 
+		$this->updateFans();
 		$this->updateSystemHealth();
 		$this->updateThermalData();
 		$this->updatePowerInformation();
@@ -386,6 +387,31 @@ class HpeIlo extends IPSModule {
 			$identSpeed = preg_replace('/\s+/','',$displayNameSpeed);
 			$this->MaintainVariable($identSpeed, $displayNameSpeed, 1, "~Intensity.100", 2, true);
 			IPS_SetParent($this->GetIDForIdent($identSpeed), $this->ReadAttributeInteger("DummyModuleFans"));
+		}
+	}
+
+	protected function updateFans() {
+
+		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
+		$result = $this->CallAPI("GET",$url);
+
+		$resultObject = json_decode($result);
+
+		foreach ($resultObject->Fans as $currentFan) { 
+			
+			$displayNameHealth = $currentFan->FanName . " Health";
+			$identHealth = preg_replace('/\s+/','',$displayNameHealth);
+			if ($currentFan->Status->Health == "OK") {
+
+				SetValue($this->GetIDForIdent($identHealth), true);
+			}
+			else {
+				SetValue($this->GetIDForIdent($identHealth), false);
+			}
+
+			$displayNameSpeed = $currentFan->FanName . " Speed";
+			$identSpeed = preg_replace('/\s+/','',$displayNameSpeed);
+			SetValue($this->GetIDForIdent($identSpeed), $currentFan->CurrentReading);
 		}
 	}
 

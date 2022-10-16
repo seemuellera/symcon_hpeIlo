@@ -1,5 +1,7 @@
 <?php
 
+const GUID_DUMMY="{485D0419-BE97-4548-AA9C-C083EB82E61E}";
+
 // Klassendefinition
 class HpeIlo extends IPSModule {
  
@@ -27,6 +29,8 @@ class HpeIlo extends IPSModule {
 		$this->RegisterPropertyString("password","");
 		$this->RegisterPropertyBoolean("ignorePowerOn", false);
 		$this->RegisterPropertyBoolean("ignorePowerOff", false);
+		$this->RegisterPropertyBoolean("ignorePowerOnVoice", false);
+		$this->RegisterPropertyBoolean("ignorePowerOffVoice", false);
 		
 		// Variable profiles
 		$variableProfileHealthState = "HPEILO.HealthState";
@@ -54,7 +58,9 @@ class HpeIlo extends IPSModule {
 		$this->RegisterVariableFloat("PowerConsumption","Power Consumption","~Watt.3680");
 		$this->RegisterVariableBoolean("PowerSupply1Health","Power Supply 1 Health", $variableProfileHealthState);
 		$this->RegisterVariableBoolean("PowerSupply2Health","Power Supply 2 Health", $variableProfileHealthState);
-		
+
+		// Attributes
+		$this->RegisterAttributeInteger("DummyModuleFans",0);		
 
 		// Default Actions
 		$this->EnableAction("Status");
@@ -76,7 +82,12 @@ class HpeIlo extends IPSModule {
 		
 		$newInterval = $this->ReadPropertyInteger("RefreshInterval") * 1000;
 		$this->SetTimerInterval("RefreshInformation", $newInterval);
-		
+
+		if ($this->ReadAttributeInteger("DummyModuleFans") == 0) {
+
+			$dummyModuleFansId = $this->CreateDummyModule("Fans");
+			$this->WriteAttributeInteger("DummyModuleFans", $dummyModuleFansId);
+		}
 
        	// Diese Zeile nicht löschen
        	parent::ApplyChanges();
@@ -97,8 +108,10 @@ class HpeIlo extends IPSModule {
 		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "hostname", "caption" => "Hostname or IP address");
 		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "username", "caption" => "Username");
 		$form['elements'][] = Array("type" => "PasswordTextBox", "name" => "password", "caption" => "Password");
-		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOn", "caption" => "Ignore Power On events via Status Action");
-		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOff", "caption" => "Ignore Power Off events via Status Action");
+		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOn", "caption" => "Ignore Power On events via Web Interface");
+		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOff", "caption" => "Ignore Power Off events via Web Interface");
+		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOnVoice", "caption" => "Ignore Power On events via Voice Assistant");
+		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOffVoice", "caption" => "Ignore Power Off events via Voice Assistant");
 		
 
 		// Add the buttons for the test center
@@ -110,6 +123,15 @@ class HpeIlo extends IPSModule {
 		// Return the completed form
 		return json_encode($form);
 
+	}
+
+	protected function CreateDummyModule($moduleName) {
+
+		$instanceId = IPS_CreateInstance(GUID_DUMMY);
+		IPS_SetName($instanceId, $moduleName);
+		IPS_SetParent($instanceId, $this->InstanceID);
+
+		return $instanceId;
 	}
 
 	public function RefreshInformation() {
@@ -358,7 +380,6 @@ class HpeIlo extends IPSModule {
 		}
 
 		$resultObject = json_decode($result);
-		//print_r($resultChassisObject)
 		
 		foreach ($resultObject->Temperatures as $currentSensor) {
 

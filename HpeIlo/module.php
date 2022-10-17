@@ -2,8 +2,10 @@
 
 const GUID_DUMMY="{485D0419-BE97-4548-AA9C-C083EB82E61E}";
 
+include_once('../libs/asCoreLib.php');
+
 // Klassendefinition
-class HpeIlo extends IPSModule {
+class HpeIlo extends AsCoreLib {
  
 	// Der Konstruktor des Moduls
 	// Überschreibt den Standard Kontruktor von IPS
@@ -108,6 +110,7 @@ class HpeIlo extends IPSModule {
         	);
 
 		// Add the Elements
+		$form['elements'][] = Array("type" => "CheckBox", "name" => "DebugOutput", "caption" => "Write Debug messages to INFO log");
 		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "RefreshInterval", "caption" => "Refresh Interval");
 		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "hostname", "caption" => "Hostname or IP address");
 		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "username", "caption" => "Username");
@@ -263,26 +266,6 @@ class HpeIlo extends IPSModule {
 				throw new Exception("Invalid Ident");
 			
 		}
-	}
-	
-	// Version 1.0
-	protected function LogMessage($message, $severity = 'INFO') {
-		
-		$logMappings = Array();
-		// $logMappings['DEBUG'] 	= 10206; Deactivated the normal debug, because it is not active
-		$logMappings['DEBUG'] 	= 10201;
-		$logMappings['INFO']	= 10201;
-		$logMappings['NOTIFY']	= 10203;
-		$logMappings['WARN'] 	= 10204;
-		$logMappings['CRIT']	= 10205;
-		
-		if ( ($severity == 'DEBUG') && ($this->ReadPropertyBoolean('DebugOutput') == false )) {
-			
-			return;
-		}
-		
-		$messageComplete = $severity . " - " . $message;
-		parent::LogMessage($messageComplete, $logMappings[$severity]);
 	}
 	
 	protected function CallAPI($method, $url, $data = false) {

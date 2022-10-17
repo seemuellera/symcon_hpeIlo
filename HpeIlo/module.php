@@ -2,8 +2,6 @@
 
 include_once __DIR__ . '/../libs/asCoreLib.php';
 
-const GUID_DUMMY="{485D0419-BE97-4548-AA9C-C083EB82E61E}";
-
 // Klassendefinition
 class HpeIlo extends AsCoreLib {
  
@@ -358,6 +356,8 @@ class HpeIlo extends AsCoreLib {
 		$result = $this->CallAPI("GET",$url);
 
 		$resultObject = json_decode($result);
+
+		$this->LogMessage("Found " . count($resultObject->Fans) . " fans","DEBUG");
 
 		foreach ($resultObject->Fans as $currentFan) { 
 			

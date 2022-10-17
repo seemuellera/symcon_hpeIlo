@@ -1,8 +1,8 @@
 <?php
 
-const GUID_DUMMY="{485D0419-BE97-4548-AA9C-C083EB82E61E}";
+include_once __DIR__ . '/../libs/asCoreLib.php';
 
-include_once('/../libs/asCoreLib.php');
+const GUID_DUMMY="{485D0419-BE97-4548-AA9C-C083EB82E61E}";
 
 // Klassendefinition
 class HpeIlo extends AsCoreLib {

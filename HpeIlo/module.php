@@ -25,8 +25,6 @@ class HpeIlo extends AsCoreLib {
 		$this->RegisterPropertyString("Sender","HpeIlo");
 		$this->RegisterPropertyInteger("RefreshInterval",0);
 		$this->RegisterPropertyString("hostname","");
-		$this->RegisterPropertyString("username","");
-		$this->RegisterPropertyString("password","");
 		$this->RegisterPropertyBoolean("ignorePowerOn", false);
 		$this->RegisterPropertyBoolean("ignorePowerOff", false);
 		$this->RegisterPropertyBoolean("ignorePowerOnVoice", false);
@@ -97,7 +95,6 @@ class HpeIlo extends AsCoreLib {
        	parent::ApplyChanges();
     }
 
-
 	public function GetConfigurationForm() {
 
         	
@@ -111,8 +108,8 @@ class HpeIlo extends AsCoreLib {
 		$form['elements'][] = Array("type" => "CheckBox", "name" => "DebugOutput", "caption" => "Write Debug messages to INFO log");
 		$form['elements'][] = Array("type" => "NumberSpinner", "name" => "RefreshInterval", "caption" => "Refresh Interval");
 		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "hostname", "caption" => "Hostname or IP address");
-		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "username", "caption" => "Username");
-		$form['elements'][] = Array("type" => "PasswordTextBox", "name" => "password", "caption" => "Password");
+		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "ApiUsername", "caption" => "Username");
+		$form['elements'][] = Array("type" => "PasswordTextBox", "name" => "ApiPassword", "caption" => "Password");
 		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOn", "caption" => "Ignore Power On events via Web Interface");
 		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOff", "caption" => "Ignore Power Off events via Web Interface");
 		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOnVoice", "caption" => "Ignore Power On events via Voice Assistant");
@@ -264,45 +261,6 @@ class HpeIlo extends AsCoreLib {
 				throw new Exception("Invalid Ident");
 			
 		}
-	}
-	
-	protected function CallAPI($method, $url, $data = false) {
-    
-		$curl = curl_init();
-
-		switch ($method)
-		{
-			case "POST":
-				curl_setopt($curl, CURLOPT_POST, 1);
-				curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
-
-				if ($data)
-					curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-				break;
-			case "PUT":
-				curl_setopt($curl, CURLOPT_PUT, 1);
-				break;
-			default:
-				if ($data)
-					$url = sprintf("%s?%s", $url, http_build_query($data));
-		}
-
-		// Optional Authentication:
-		curl_setopt($curl, CURLOPT_VERBOSE, TRUE);
-
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-		curl_setopt($curl, CURLOPT_USERPWD, $this->ReadPropertyString("username") . ":" . $this->ReadPropertyString("password") );
-
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
-		$result = curl_exec($curl);
-
-		curl_close($curl);
-
-		return $result;
 	}
 	
 	protected function updateSystemHealth() {

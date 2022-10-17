@@ -283,11 +283,11 @@ class HpeIlo extends AsCoreLib {
 		
 		if ($resultObject->Status->Health == "OK") {
 			
-			SetValue($this->GetIDForIdent("SystemHealth"), true);
+			$this->WriteValue("SystemHealth", true);
 		}
 		else {
 			
-			SetValue($this->GetIDForIdent("SystemHealth"), false);
+			$this->WriteValue("SystemHealth", false);
 		}
 		
 		switch ($resultObject->Status->State) {

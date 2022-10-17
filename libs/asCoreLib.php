@@ -105,5 +105,16 @@ class AsCoreLib extends IPSModule {
 
 		return $result;
 	}
+
+	//Convenience Function to keep a similar way to interact with Variable values:
+	protected function WriteValue($varIdent, $newValue) {
+
+		SetValue($this->GetIDForIdent($varIdent), $newValue);
+	}
+
+	protected function ReadValue($varIdent) {
+
+		return GetValue($varIdent);
+	}
 }
 ?>

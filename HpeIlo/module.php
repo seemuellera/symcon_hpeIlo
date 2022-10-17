@@ -334,6 +334,16 @@ class HpeIlo extends AsCoreLib {
 		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
 		$result = $this->CallAPI("GET",$url);
 
+		if (! $result) {
+			
+			$this->updateIloReachable(false);
+			return;
+		}
+		else {
+			
+			$this->updateIloReachable(true);
+		}
+
 		$resultObject = json_decode($result);
 
 		foreach ($resultObject->Fans as $currentFan) { 

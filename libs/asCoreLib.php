@@ -116,5 +116,11 @@ class AsCoreLib extends IPSModule {
 
 		return GetValue($varIdent);
 	}
+
+	// Function to standardize Ident fom Variable text creation:
+	protected function generateIdent($variableDisplayName) {
+
+		return preg_replace('/\s+/','',$variableDisplayName);
+	}
 }
 ?>

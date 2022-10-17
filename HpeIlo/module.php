@@ -293,16 +293,16 @@ class HpeIlo extends AsCoreLib {
 		switch ($resultObject->Status->State) {
 			
 			case "Disabled":
-				SetValue($this->GetIDForIdent("Status") , 0);
+				$this->WriteValue("Status", 0);
 				break;
 			case "Enabled":
-				SetValue($this->GetIDForIdent("Status") , 1);
+				$this->WriteValue("Status", 1);
 				break;
 			case "Starting":
-				SetValue($this->GetIDForIdent("Status") , 1);
+				$this->WriteValue("Status", 1);
 				break;
 			default:
-				SetValue($this->GetIDForIdent("Status") , 0);
+				$this->WriteValue("Status", 0);
 				$this->LogMessage("Received unknow power status of " . $resultObject->Status->State, "CRIT");
 				break;
 		}
@@ -342,15 +342,16 @@ class HpeIlo extends AsCoreLib {
 			$identHealth = preg_replace('/\s+/','',$displayNameHealth);
 			if ($currentFan->Status->Health == "OK") {
 
-				SetValue($this->GetIDForIdent($identHealth), true);
+				$this->WriteValue($identHealth, true);
 			}
 			else {
-				SetValue($this->GetIDForIdent($identHealth), false);
+	
+				$this->WriteValue($identHealth, false);
 			}
 
 			$displayNameSpeed = $currentFan->FanName . " Speed";
 			$identSpeed = preg_replace('/\s+/','',$displayNameSpeed);
-			SetValue($this->GetIDForIdent($identSpeed), $currentFan->CurrentReading);
+			$this->WriteValue($identSpeed, $currentFan->CurrentReading);
 		}
 	}
 

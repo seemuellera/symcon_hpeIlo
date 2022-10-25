@@ -63,7 +63,9 @@ class HpeIlo extends AsCoreLib {
 		$this->RegisterVariableBoolean("PowerSupply2Health","Power Supply 2 Health", $variableProfileHealthState);
 
 		// Attributes
-		$this->RegisterAttributeInteger("DummyModuleFans",0);		
+		$this->RegisterAttributeInteger("DummyModuleFans",0);
+		$this->RegisterAttributeInteger("DummyModulePowerSupplies",0);	
+		$this->RegisterAttributeInteger("DummyModuleTemperatureSensors",0);
 
 		// Default Actions
 		$this->EnableAction("Status");
@@ -91,10 +93,21 @@ class HpeIlo extends AsCoreLib {
 			$dummyModuleFansId = $this->CreateDummyModule("Fans");
 			$this->WriteAttributeInteger("DummyModuleFans", $dummyModuleFansId);
 		}
-		else {
+		
+		if (! $this->CheckDummyModule("Power Supplies")) {
 
-			$this->detectFans();
+			$dummyModulePowerSuppliesId = $this->CreateDummyModule("Power Supplies");
+			$this->WriteAttributeInteger("DummyModulePowerSupplies", $dummyModulePowerSuppliesId);
 		}
+
+		if (! $this->CheckDummyModule("Temperature Sensors")) {
+
+			$dummyModuleTemperatureSensorsId = $this->CreateDummyModule("Temperature Sensors");
+			$this->WriteAttributeInteger("DummyModuleTemperatureSensors", $dummyModuleTemperatureSensorsId);
+		}
+
+		$this->detectFans();
+		
 
        	// Diese Zeile nicht löschen
        	parent::ApplyChanges();

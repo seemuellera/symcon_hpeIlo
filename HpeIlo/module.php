@@ -426,23 +426,42 @@ class HpeIlo extends AsCoreLib {
 
 	protected function detectFans() {
 
-		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
-		$result = $this->CallAPI("GET",$url);
+		if (! $this->thermalData) {
 
-		$resultObject = json_decode($result);
-
-		$this->LogMessage("Fan detection: found " . count($resultObject->Fans) . " fans","DEBUG");
-
-		foreach ($resultObject->Fans as $currentFan) { 
-			
-			$displayNameHealth = $currentFan->FanName . " Health";
-			$identHealth = preg_replace('/\s+/','',$displayNameHealth);
-			@$this->MaintainVariable($identHealth, $displayNameHealth, 0, "HPEILO.HealthState", 1, true);
-
-			$displayNameSpeed = $currentFan->FanName . " Speed";
-			$identSpeed = preg_replace('/\s+/','',$displayNameSpeed);
-			@$this->MaintainVariable($identSpeed, $displayNameSpeed, 1, "~Intensity.100", 2, true);
+			$this->LogMessage("No Fan data found","DEBUG");
+			return;
 		}
+
+		$this->LogMessage("Fan detection: found " . count($this->thermalData->Fans) . " fans","DEBUG");
+
+		$allVariables = Array();
+
+		foreach ($this->thermalData->Fans as $currentFan) {
+
+			$fanName = $currentFan->FanName;
+			preg_match('/Fan (\d+)/', $fanName, $matches);
+			$fanId = $matches[1][0];
+			$sortBase = $fanId * 10;
+
+			$fanState = new stdClass();
+			$fanState->Type = "Boolean";
+			$fanState->Name = "$fanName State";
+			$fanState->Ident = $this->generateIdent("HpeIloFan" . $fanName . "State");
+			$fanState->Position = $sortBase + 1;
+			$fanState->Profile = "HPEILO.HealthState";
+			$fanState->DefaultValue = false;
+			array_push($allVariables, $fanState);
+
+			$fanSpeed = new stdClass();
+			$fanSpeed->Type = "Integer";
+			$fanSpeed->Name = "$fanName Speed";
+			$fanSpeed->Ident = $this->generateIdent("HpeIloFan" . $fanName . "Speed");
+			$fanSpeed->Position = $sortBase + 2;
+			$fanSpeed->Profile = "~Intensity.100";
+			array_push($allVariables, $fanSpeed);
+		}
+
+		$this->MaintainDummyModule($this->ReadAttributeInteger("DummyModuleFans"), $allVariables);
 	}
 
 	protected function detectPowerSupplies() {
@@ -508,37 +527,32 @@ class HpeIlo extends AsCoreLib {
 
 	protected function updateFans() {
 
-		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
-		$result = $this->CallAPI("GET",$url);
+		if (! $this->thermalData) {
 
-		if (! $result) {
-			
-			$this->updateIloReachable(false);
+			$this->LogMessage("No Fan data found","DEBUG");
 			return;
 		}
-		else {
-			
-			$this->updateIloReachable(true);
-		}
 
-		$resultObject = json_decode($result);
+		$this->LogMessage("Fan update: found " . count($this->thermalData->Fans) . " fans","DEBUG");
 
-		foreach ($resultObject->Fans as $currentFan) { 
-			
-			$displayNameHealth = $currentFan->FanName . " Health";
-			$identHealth = preg_replace('/\s+/','',$displayNameHealth);
+		foreach ($this->thermalData->Fans as $currentFan) {
+
+			$fanName = $currentFan->FanName;
+
+			$this->LogMessage("Fan update: updating fan $fanName","DEBUG");
+
+			$identState = $this->generateIdent("HpeIloFan" . $fanName . "State");
 			if ($currentFan->Status->Health == "OK") {
 
-				$this->WriteValue($identHealth, true);
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identState, true);
 			}
 			else {
-	
-				$this->WriteValue($identHealth, false);
+
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identState, false);
 			}
 
-			$displayNameSpeed = $currentFan->FanName . " Speed";
-			$identSpeed = preg_replace('/\s+/','',$displayNameSpeed);
-			$this->WriteValue($identSpeed, $currentFan->CurrentReading);
+			$identSpeed = $this->generateIdent("HpeIloFan" . $fanName . "Speed");
+			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identSpeed, $currentFan->CurrentReading);
 		}
 	}
 

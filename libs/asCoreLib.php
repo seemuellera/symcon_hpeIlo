@@ -135,7 +135,7 @@ class AsCoreLib extends IPSModule {
 
 	protected function CheckDummyModule($moduleName) {
 
-		$instanceId = IPS_GetObjectIDByName($moduleName, $this->InstanceID);
+		$instanceId = @IPS_GetObjectIDByName($moduleName, $this->InstanceID);
 
 		if ($instanceId) {
 

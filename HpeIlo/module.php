@@ -86,7 +86,7 @@ class HpeIlo extends AsCoreLib {
 		$newInterval = $this->ReadPropertyInteger("RefreshInterval") * 1000;
 		$this->SetTimerInterval("RefreshInformation", $newInterval);
 
-		if ($this->ReadAttributeInteger("DummyModuleFans") == 0) {
+		if (! $this->CheckDummyModule("Fans")) {
 
 			$dummyModuleFansId = $this->CreateDummyModule("Fans");
 			$this->WriteAttributeInteger("DummyModuleFans", $dummyModuleFansId);

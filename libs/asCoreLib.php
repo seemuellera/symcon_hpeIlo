@@ -133,5 +133,21 @@ class AsCoreLib extends IPSModule {
 		return $instanceId;
 	}
 
+	protected function CheckDummyModule($moduleName) {
+
+		$instanceId = IPS_GetObjectIDByName($moduleName, $this->InstanceID);
+
+		if ($instanceId) {
+
+			$instanceInfo = IPS_GetInstance($instanceId);
+
+			if ($instanceInfo['ModuleInfo']['ModuleID'] != GUID_DUMMY) {
+
+				return false;
+			}
+		}
+		
+		return $instanceId;
+	}
 }
 ?>

@@ -442,7 +442,7 @@ class HpeIlo extends AsCoreLib {
 			return;
 		}
 
-		$this->LogMessage("Power supply detection: found " . count($this->powerData->PowerSupplies) . " fans","DEBUG");
+		$this->LogMessage("Power supply detection: found " . count($this->powerData->PowerSupplies) . " power supplies","DEBUG");
 
 		$allVariables = Array();
 
@@ -539,7 +539,7 @@ class HpeIlo extends AsCoreLib {
 			return;
 		}
 
-		$this->LogMessage("Power supply update: found " . count($this->powerData->PowerSupplies) . " fans","DEBUG");
+		$this->LogMessage("Power supply update: found " . count($this->powerData->PowerSupplies) . " power supplies","DEBUG");
 
 		foreach ($this->powerData->PowerSupplies as $currentPowerSupply) {
 

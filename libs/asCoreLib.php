@@ -247,6 +247,12 @@ class AsCoreLib extends IPSModule {
 	protected function WriteDummyModuleValue($moduleId, $varIdent, $newValue) {
 
 		$variableId = @IPS_GetObjectIDByIdent($varIdent, $moduleId);
+
+		if (! $variableId) {
+
+			$this->LogMessage("Variable with ident $varIdent not found in dummy module $moduleId","WARN");
+		}
+
 		SetValue($variableId, $newValue);
 	}
 

@@ -420,7 +420,7 @@ class HpeIlo extends AsCoreLib {
 
 		$resultObject = json_decode($result);
 
-		$this->LogMessage("Found " . count($resultObject->Fans) . " fans","DEBUG");
+		$this->LogMessage("Fan detection: found " . count($resultObject->Fans) . " fans","DEBUG");
 
 		foreach ($resultObject->Fans as $currentFan) { 
 			
@@ -441,6 +441,8 @@ class HpeIlo extends AsCoreLib {
 			$this->LogMessage("No Power Supply data found","DEBUG");
 			return;
 		}
+
+		$this->LogMessage("Power supply detection: found " . count($this->powerData->PowerSupplies) . " fans","DEBUG");
 
 		$allVariables = Array();
 
@@ -537,9 +539,13 @@ class HpeIlo extends AsCoreLib {
 			return;
 		}
 
+		$this->LogMessage("Power supply update: found " . count($this->powerData->PowerSupplies) . " fans","DEBUG");
+
 		foreach ($this->powerData->PowerSupplies as $currentPowerSupply) {
 
 			$bayNumber = $currentPowerSupply->Oem->Hp->BayNumber;
+
+			$this->LogMessage("Power supply update: updating Powersupply in bay number $bayNumber","DEBUG");
 
 			$identSerialNumber = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "SerialNumber");
 			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModulePowerSupplies"), $identSerialNumber, $currentPowerSupply->SerialNumber);

@@ -106,6 +106,8 @@ class HpeIlo extends AsCoreLib {
 			$this->WriteAttributeInteger("DummyModuleTemperatureSensors", $dummyModuleTemperatureSensorsId);
 		}
 
+		$this->fetchIloData();
+
 		$this->detectFans();
 		$this->detectPowerSupplies();
 

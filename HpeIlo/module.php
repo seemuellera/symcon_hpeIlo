@@ -52,9 +52,7 @@ class HpeIlo extends AsCoreLib {
 		$this->RegisterVariableBoolean("IloCardReachable","ILO card reachable", "~Alert.Reversed");
 		$this->RegisterVariableBoolean("SystemHealth","System Health",$variableProfileHealthState);
 		$this->RegisterVariableFloat("PowerConsumption","Power Consumption","~Watt.3680");
-		$this->RegisterVariableBoolean("PowerSupply1Health","Power Supply 1 Health", $variableProfileHealthState);
-		$this->RegisterVariableBoolean("PowerSupply2Health","Power Supply 2 Health", $variableProfileHealthState);
-
+		
 		// Attributes
 		$this->RegisterAttributeInteger("DummyModuleFans",0);
 		$this->RegisterAttributeInteger("DummyModulePowerSupplies",0);	
@@ -160,12 +158,10 @@ class HpeIlo extends AsCoreLib {
 		$this->updateFans();
 		$this->LogMessage("- Updating Temperature Sensor data","DEBUG");
 		$this->updateTemperatureSensors();
-		$this->LogMessage("- Updating System Data","DEBUG");
-		$this->updateSystemHealth();
-		$this->LogMessage("- Updating Power consumption data","DEBUG");
-		$this->updatePowerInformation();
 		$this->LogMessage("- Updating Power supply data","DEBUG");
 		$this->updatePowerSupplies();
+		$this->LogMessage("- Updating Global System data","DEBUG");
+		$this->updateGlobalSystemData();
 	}
 
 	protected function fetchIloData() {
@@ -372,52 +368,6 @@ class HpeIlo extends AsCoreLib {
 	}
 
 	
-	
-	protected function updateSystemHealth() {
-		
-		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1";
-		$result = $this->CallAPI("GET",$url);
-		
-		if (! $result) {
-			
-			$this->updateIloReachable(false);
-			return;
-		}
-		else {
-			
-			$this->updateIloReachable(true);
-		}
-
-		$resultObject = json_decode($result);
-		//print_r($resultChassisObject);
-		
-		if ($resultObject->Status->Health == "OK") {
-			
-			$this->WriteValue("SystemHealth", true);
-		}
-		else {
-			
-			$this->WriteValue("SystemHealth", false);
-		}
-		
-		switch ($resultObject->Status->State) {
-			
-			case "Disabled":
-				$this->WriteValue("Status", 0);
-				break;
-			case "Enabled":
-				$this->WriteValue("Status", 1);
-				break;
-			case "Starting":
-				$this->WriteValue("Status", 1);
-				break;
-			default:
-				$this->WriteValue("Status", 0);
-				$this->LogMessage("Received unknow power status of " . $resultObject->Status->State, "CRIT");
-				break;
-		}
-	}
-
 	protected function detectFans() {
 
 		if (! $this->thermalData) {
@@ -681,46 +631,49 @@ class HpeIlo extends AsCoreLib {
 			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModulePowerSupplies"), $identInputVoltage, $currentPowerSupply->LineInputVoltage);
 		}
 	}
-	
-	protected function updatePowerInformation() {
-		
-		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Power";
-		$result = $this->CallAPI("GET",$url);
-		
-		if (! $result) {
-			
-			$this->updateIloReachable(false);
+
+	protected function updateGlobalSystemData() {
+
+		if (! $this->chassisData) {
+
+			$this->LogMessage("No Chassis Data found","DEBUG");
 			return;
 		}
+
+		// Global System Health Status
+		if ($this->chassisData->Status->Health == "OK") {
+
+			$this->WriteValue("SystemHealth", true);
+		}
 		else {
 			
-			$this->updateIloReachable(true);
+			$this->WriteValue("SystemHealth", false);
 		}
 
-		$resultObject = json_decode($result);
-		//print_r($resultChassisObject);
-		SetValue($this->GetIDForIdent("PowerConsumption") , $resultObject->PowerConsumedWatts);
-		
-		if ($resultObject->PowerSupplies[0]->Status->Health == "OK") {
+		// System Power State
+		switch ($this->chassisData->Status->State) {
 			
-			SetValue($this->GetIDForIdent("PowerSupply1Health"), true);
+			case "Disabled":
+				$this->WriteValue("Status", 0);
+				break;
+			case "Enabled":
+				$this->WriteValue("Status", 1);
+				break;
+			case "Starting":
+				$this->WriteValue("Status", 1);
+				break;
+			default:
+				$this->WriteValue("Status", 0);
+				$this->LogMessage("Received unknow power status of " . $this->chassisData->Status->State, "CRIT");
+				break;
 		}
-		else {
-			
-			SetValue($this->GetIDForIdent("PowerSupply1Health"), false);
+
+		if (! $this->powerData) {
+
+			$this->LogMessage("No Power Data found","DEBUG");
+			return;
 		}
-		
-		if (count($resultObject->PowerSupplies) == 2) {
-			
-			if ($resultObject->PowerSupplies[1]->Status->Health == "OK") {
-				
-				SetValue($this->GetIDForIdent("PowerSupply2Health"), true);
-			}
-			else {
-				
-				SetValue($this->GetIDForIdent("PowerSupply2Health"), false);
-			}
-		}
+		$this->WriteValue("PowerConsumption", $this->powerData->PowerConsumedWatts);
 	}
 	
 	protected function updateIloReachable($newState) {

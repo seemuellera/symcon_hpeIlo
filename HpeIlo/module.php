@@ -14,11 +14,6 @@ class HpeIlo extends AsCoreLib {
 	// Überschreibt den Standard Kontruktor von IPS
 	public function __construct($InstanceID) {
 
-		// Initialize class properties
-		$this->$chassisData = new stdClass();
-		$this->$thermalData = new stdClass();
-		$this->$powerData = new stdClass();
-
 		// Diese Zeile nicht löschen
         parent::__construct($InstanceID);
  
@@ -336,6 +331,8 @@ class HpeIlo extends AsCoreLib {
 	}
 
 	public function PrintServerSummary() {
+
+		$this->fetchIloData();
 
 		$text = "Server Model: " . $this->getModel() . "\n" .
 				"Number of Power supplies: " . $this->getNumberOfPowerSupplies() . "\n" . 

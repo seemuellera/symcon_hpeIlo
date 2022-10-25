@@ -109,6 +109,7 @@ class HpeIlo extends AsCoreLib {
 		$this->fetchIloData();
 
 		$this->detectFans();
+		$this->detectTemperatureSensors();
 		$this->detectPowerSupplies();
 
        	// Diese Zeile nicht löschen
@@ -164,6 +165,8 @@ class HpeIlo extends AsCoreLib {
 
 		$this->LogMessage("- Updating Fan data","DEBUG");
 		$this->updateFans();
+		$this->LogMessage("- Updating Temperature Sensor data","DEBUG");
+		$this->updateTemperatureSensors();
 		$this->LogMessage("- Updating System Data","DEBUG");
 		$this->updateSystemHealth();
 		$this->LogMessage("- Updating Thermal","DEBUG");
@@ -464,6 +467,52 @@ class HpeIlo extends AsCoreLib {
 		$this->MaintainDummyModule($this->ReadAttributeInteger("DummyModuleFans"), $allVariables);
 	}
 
+	protected function detectTemperatureSensors() {
+
+		if (! $this->thermalData) {
+
+			$this->LogMessage("No Temperature Sensor data found","DEBUG");
+			return;
+		}
+
+		$this->LogMessage("Temperature Sensor detection: found " . count($this->thermalData->Temperatures) . " sensors","DEBUG");
+
+		$allVariables = Array();
+
+		foreach ($this->thermalData->Temperatures as $currentTemperature) {
+
+			$sensorName = $currentTemperature->Name;
+			$sortBase = $currentTemperature->Number * 10;
+			
+			$sensorTemperature = new stdClass();
+			$sensorTemperature->Type = "Float";
+			$sensorTemperature->Name = "$sensorName Current Temperature";
+			$sensorTemperature->Ident = $this->generateIdent("HpeIloTemperature" . $sensorName . "CurrentTemperature");
+			$sensorTemperature->Position = $sortBase + 0;
+			$sensorTemperature->Profile = "~Temperature";
+			array_push($allVariables, $sensorTemperature);
+
+			$sensorState = new stdClass();
+			$sensorState->Type = "Boolean";
+			$sensorState->Name = "$sensorName State";
+			$sensorState->Ident = $this->generateIdent("HpeIloTemperature" . $sensorName . "State");
+			$sensorState->Position = $sortBase + 1;
+			$sensorState->Profile = "HPEILO.HealthState";
+			$sensorState->DefaultValue = false;
+			array_push($allVariables, $sensorState);
+
+			$sensorCriticalTemperature = new stdClass();
+			$sensorCriticalTemperature->Type = "Float";
+			$sensorCriticalTemperature->Name = "$sensorName Critical Temperature";
+			$sensorCriticalTemperature->Ident = $this->generateIdent("HpeIloTemperature" . $sensorName . "CriticalTemperature");
+			$sensorCriticalTemperature->Position = $sortBase + 0;
+			$sensorCriticalTemperature->Profile = "~Temperature";
+			array_push($allVariables, $sensorCriticalTemperature);
+		}
+
+		$this->MaintainDummyModule($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $allVariables);
+	}
+
 	protected function detectPowerSupplies() {
 
 		if (! $this->powerData) {
@@ -553,6 +602,40 @@ class HpeIlo extends AsCoreLib {
 
 			$identSpeed = $this->generateIdent("HpeIloFan" . $fanName . "Speed");
 			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identSpeed, $currentFan->CurrentReading);
+		}
+	}
+
+	protected function updateTemperatureSensors() {
+
+		if (! $this->thermalData) {
+
+			$this->LogMessage("No Temperature Sensor data found","DEBUG");
+			return;
+		}
+
+		$this->LogMessage("Temperature Sensor update: found " . count($this->thermalData->Temperatures) . " sensors","DEBUG");
+
+		foreach ($this->thermalData->Temperatures as $currentTemperature) {
+
+			$sensorName = $currentTemperature->Name;
+
+			$this->LogMessage("Temperature Sensor update: updating sensor $sensorName","DEBUG");
+
+			$identState = $this->generateIdent("HpeIloTemperature" . $sensorName . "State");
+			if ($currentTemperature->Status->Health == "OK") {
+
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identState, true);
+			}
+			else {
+
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identState, false);
+			}
+
+			$identCurrentTemperature = $this->generateIdent("HpeIloTemperature" . $sensorName . "CurrentTemperature");
+			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCurrentTemperature, $currentTemperature->CurrentReading);
+
+			$identCriticalTemperature = $this->generateIdent("HpeIloTemperature" . $sensorName . "CriticalTemperature");
+			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCriticalTemperature, $currentTemperature->UpperThresholdCritical);
 		}
 	}
 

@@ -511,7 +511,7 @@ class HpeIlo extends AsCoreLib {
 			$sensorCriticalTemperature->Type = "Float";
 			$sensorCriticalTemperature->Name = "$sensorName Critical Temperature";
 			$sensorCriticalTemperature->Ident = $this->generateIdent("HpeIloTemperature" . $sensorName . "CriticalTemperature");
-			$sensorCriticalTemperature->Position = $sortBase + 0;
+			$sensorCriticalTemperature->Position = $sortBase + 2;
 			$sensorCriticalTemperature->Profile = "~Temperature";
 			array_push($allVariables, $sensorCriticalTemperature);
 		}

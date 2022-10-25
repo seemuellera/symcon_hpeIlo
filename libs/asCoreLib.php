@@ -251,7 +251,10 @@ class AsCoreLib extends IPSModule {
 		if (! $variableId) {
 
 			$this->LogMessage("Variable with ident $varIdent not found in dummy module $moduleId","WARN");
+			return false;
 		}
+
+		$this->LogMessage("Updating Variable $variableId to value $newValue", "DEBUG");
 
 		SetValue($variableId, $newValue);
 	}

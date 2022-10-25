@@ -474,7 +474,7 @@ class HpeIlo extends AsCoreLib {
 
 			$powerSupplyVoltage = new stdClass();
 			$powerSupplyVoltage->Type = "Float";
-			$powerSupplyVoltage->Name = "Power Supply " . $bayNumber . " InputVoltage";
+			$powerSupplyVoltage->Name = "Power Supply " . $bayNumber . " Input Voltage";
 			$powerSupplyVoltage->Ident = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "InputVoltage");
 			$powerSupplyVoltage->Position = $sortBase + 4;
 			$powerSupplyVoltage->Profile = "~Volt.230";

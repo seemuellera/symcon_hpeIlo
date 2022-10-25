@@ -218,18 +218,27 @@ class AsCoreLib extends IPSModule {
 			}
 
 			// This part will be executed, independently if the variable was just created or did exist before
-			$variableDetails = IPS_GetVariable($variableId);
-			if ($variableDetails['VariableCustomProfile'] != $variable->Profile) {
+			
+			// Check if a variable profile is defined and maintain it 
+			if (isset($variable->Profile)) {
 
-				$this->LogMessage("Variable with Ident " . $variable->Ident . " gets the correct profile " . $variable->Profile . " assigned", "DEBUG");
-				IPS_SetVariableCustomProfile($variableId, $variable->Profile);
+				$variableDetails = IPS_GetVariable($variableId);
+				if ($variableDetails['VariableCustomProfile'] != $variable->Profile) {
+
+					$this->LogMessage("Variable with Ident " . $variable->Ident . " gets the correct profile " . $variable->Profile . " assigned", "DEBUG");
+					IPS_SetVariableCustomProfile($variableId, $variable->Profile);
+				}
 			}
 
-			$objectDetails = IPS_GetObject($variableId);
-			if ($objectDetails['ObjectPosition'] != $variable->Position) {
+			// Check if a sorting position is defined and maintain it
+			if (isset($variable->Position)) {
+			
+				$objectDetails = IPS_GetObject($variableId);
+				if ($objectDetails['ObjectPosition'] != $variable->Position) {
 
-				$this->LogMessage("Variable with Ident " . $variable->Ident . " gets the correct position " . $variable->Position . " assigned", "DEBUG");
-				IPS_SetPosition($variableId, $variable->Position);
+					$this->LogMessage("Variable with Ident " . $variable->Ident . " gets the correct position " . $variable->Position . " assigned", "DEBUG");
+					IPS_SetPosition($variableId, $variable->Position);
+				}
 			}
 		}
 	}

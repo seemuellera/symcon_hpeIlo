@@ -4,6 +4,11 @@ include_once __DIR__ . '/../libs/asCoreLib.php';
 
 // Klassendefinition
 class HpeIlo extends AsCoreLib {
+
+	// Global properties
+	protected $chassisData;
+	protected $thermalData;
+	protected $powerData;
  
 	// Der Konstruktor des Moduls
 	// Überschreibt den Standard Kontruktor von IPS
@@ -13,6 +18,9 @@ class HpeIlo extends AsCoreLib {
         parent::__construct($InstanceID);
  
         // Selbsterstellter Code
+		$this->$chassisData = new stdClass();
+		$this->$thermalData = new stdClass();
+		$this->$powerData = new stdClass();
     }
  
     // Überschreibt die interne IPS_Create($id) Funktion
@@ -121,19 +129,11 @@ class HpeIlo extends AsCoreLib {
 		$form['actions'][] = Array("type" => "Button", "label" => "Press Power Button", "onClick" => 'HPEILO_PressPowerButton($id);');
 		$form['actions'][] = Array("type" => "Button", "label" => "Force Power Off", "onClick" => 'HPEILO_ForcePowerOff($id);');
 		$form['actions'][] = Array("type" => "Button", "label" => "Force Power On", "onClick" => 'HPEILO_ForcePowerOn($id);');
+		$form['actions'][] = Array("type" => "Button", "label" => "Print Server information", "onClick" => 'HPEILO_PrintServerSummary($id);');
 
 		// Return the completed form
 		return json_encode($form);
 
-	}
-
-	protected function CreateDummyModule($moduleName) {
-
-		$instanceId = IPS_CreateInstance(GUID_DUMMY);
-		IPS_SetName($instanceId, $moduleName);
-		IPS_SetParent($instanceId, $this->InstanceID);
-
-		return $instanceId;
 	}
 
 	public function RefreshInformation() {
@@ -142,6 +142,36 @@ class HpeIlo extends AsCoreLib {
 		$this->updateSystemHealth();
 		$this->updateThermalData();
 		$this->updatePowerInformation();
+	}
+
+	protected function fetchIloData() {
+
+		// Chassis Data
+		$urlChassis = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1";
+		$resultChassis = $this->CallAPI("GET",$urlChassis);
+		
+		// Check reachability on the first run
+		if (! $resultChassis) {
+			
+			$this->updateIloReachable(false);
+			return;
+		}
+		else {
+			
+			$this->updateIloReachable(true);
+		}
+
+		$this->chassisData = json_decode($resultChassis);
+
+		// Termal data
+		$urlThermal = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
+		$resultThermal = $this->CallAPI("GET",$urlThermal);
+		$this->thermalData = json_decode($resultThermal);
+
+		// Power data
+		$urlPower = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Power";
+		$resultPower = $this->CallAPI("GET",$urlPower);
+		$this->powerData = json_decode($resultPower);
 	}
 	
 	public function PressPowerButton() {
@@ -261,6 +291,56 @@ class HpeIlo extends AsCoreLib {
 				throw new Exception("Invalid Ident");
 			
 		}
+	}
+
+	protected function getNumberOfPowerSupplies() {
+
+		if (! $this->powerData) {
+
+			return false;
+		}
+
+		return count($this->powerData->PowerSupplies);
+	}
+
+	protected function getNumberOfFans() {
+
+		if (! $this->thermalData) {
+
+			return false;
+		}
+
+		return count($this->thermalData->Fans);
+	}
+
+	protected function getNumberOfTemperatureSensors() {
+
+		if (! $this->thermalData) {
+
+			return false;
+		}
+
+		return count($this->thermalData->Temperatures);
+	}
+
+	protected function getModel() {
+
+		if (! $this->chassisData) {
+
+			return false;
+		}
+
+		return $this->chassisData->Manufacturer . " " . $this->chassisData->Model;
+	}
+
+	public function PrintServerSummary() {
+
+		$text = "Server Model: " . $this->getModel() . "\n" .
+				"Number of Power supplies: " . $this->getNumberOfPowerSupplies() . "\n" . 
+				"Number of Fans: " . $this->getNumberOfFans() . "\n" . 
+				"Number of Temperature Sensors: " . $this->getNumberOfTemperatureSensors();
+
+		echo $text;
 	}
 	
 	protected function updateSystemHealth() {

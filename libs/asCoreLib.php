@@ -122,5 +122,16 @@ class AsCoreLib extends IPSModule {
 
 		return preg_replace('/\s+/','',$variableDisplayName);
 	}
+
+	// Create a Dummy instance below the current instance:
+	protected function CreateDummyModule($moduleName) {
+
+		$instanceId = IPS_CreateInstance(GUID_DUMMY);
+		IPS_SetName($instanceId, $moduleName);
+		IPS_SetParent($instanceId, $this->InstanceID);
+
+		return $instanceId;
+	}
+
 }
 ?>

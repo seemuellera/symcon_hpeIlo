@@ -121,8 +121,9 @@ class AsCoreLib extends IPSModule {
 	protected function generateIdent($variableDisplayName) {
 
 		$filterWhitespaces = preg_replace('/\s+/','',$variableDisplayName);
-		$filterDashes = preg_replace('/-/','',$filterWhitespaces);
-		return $filterDashes;
+		$filterDashes = preg_replace('/-+/','',$filterWhitespaces);
+		$filterSlashes = preg_replace('/\/+/','',$filterDashes);
+		return $filterSlashes;
 	}
 
 	// lookup Variable types

@@ -123,6 +123,25 @@ class AsCoreLib extends IPSModule {
 		return preg_replace('/\s+/','',$variableDisplayName);
 	}
 
+	// lookup Variable types
+	protected function LookupVariableType($typeName) {
+
+		$variableTypes = Array();
+		$variableTypes['Boolean'] = 0;
+		$variableTypes['Integer'] = 1;
+		$variableTypes['Float'] = 2;
+		$variableTypes['String'] = 3;
+
+		if (array_key_exists($typeName, $variableTypes)) {
+
+			return $variableTypes[$typeName];
+		}
+		else {
+
+			return false;
+		}
+	}
+
 	// Create a Dummy instance below the current instance:
 	protected function CreateDummyModule($moduleName) {
 
@@ -148,6 +167,71 @@ class AsCoreLib extends IPSModule {
 		}
 		
 		return $instanceId;
+	}
+
+	protected function GetIdentsForDummyModuleId($moduleId) {
+
+		$variables = IPS_GetChildrenIDs($moduleId);
+
+		$variableIdents = Array();
+
+		foreach ($variables as $variable) {
+
+			$objectDetails = IPS_GetObject($variable);
+
+			array_push($variableIdents, $objectDetails['ObjectIdent']);
+		}
+		
+		return $variableIdents;
+	}
+
+	protected function MaintainDummyModule($moduleId, $variables) {
+
+		if (! $variables) {
+
+			return false;
+		}
+
+		// We save the maintained idents to perform a cleanup afterwards
+		$maintainedIdents = Array();
+
+		foreach ($variables as $variable) {
+
+			// Check if the variable needs to be created
+			$variableId = @IPS_GetObjectIDByIdent($variable->Ident, $moduleId);
+
+			if (!$variableId) {
+
+				$this->LogMessage("Variable with Ident " . $variable->Ident . " does not exist and will be created", "DEBUG");
+
+				// The variable does not exist so we need to create it first
+				$variableId = IPS_CreateVariable($this->LookupVariableType($variable->Type));
+				IPS_SetParent($variableId, $moduleId);
+				IPS_SetName($variableId, $variable->Name);
+				IPS_SetIdent($variableId, $variable->Ident);
+
+				// Assign the default value if it exists
+				if (isset($variable->DefaultValue)) {
+
+					SetValue($variableId, $variable->DefaultValue);
+				}
+			}
+
+			// This part will be executed, independently if the variable was just created or did exist before
+			$variableDetails = IPS_GetVariable($variableId);
+			if ($variableDetails['VariableCustomProfile'] != $variable->Profile) {
+
+				$this->LogMessage("Variable with Ident " . $variable->Ident . " gets the correct profile " . $variable->Profile . " assigned", "DEBUG");
+				IPS_SetVariableCustomProfile($variableId, $variable->Profile);
+			}
+
+			$objectDetails = IPS_GetObject($variableId);
+			if ($objectDetails['ObjectPosition'] != $variable->Position) {
+
+				$this->LogMessage("Variable with Ident " . $variable->Ident . " gets the correct position " . $variable->Position . " assigned", "DEBUG");
+				IPS_SetPosition($variableId, $variable->Position);
+			}
+		}
 	}
 }
 ?>

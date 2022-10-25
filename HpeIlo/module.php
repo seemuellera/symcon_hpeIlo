@@ -107,7 +107,7 @@ class HpeIlo extends AsCoreLib {
 		}
 
 		$this->detectFans();
-		
+		$this->detectPowerSupplies();
 
        	// Diese Zeile nicht löschen
        	parent::ApplyChanges();
@@ -354,6 +354,8 @@ class HpeIlo extends AsCoreLib {
 
 		echo $text;
 	}
+
+	
 	
 	protected function updateSystemHealth() {
 		
@@ -419,6 +421,65 @@ class HpeIlo extends AsCoreLib {
 			$identSpeed = preg_replace('/\s+/','',$displayNameSpeed);
 			@$this->MaintainVariable($identSpeed, $displayNameSpeed, 1, "~Intensity.100", 2, true);
 		}
+	}
+
+	protected function detectPowerSupplies() {
+
+		if (! $this->powerData) {
+
+			$this->LogMessage("No Power Supply data found","DEBUG");
+			return;
+		}
+
+		$allVariables = Array();
+
+		foreach ($this->powerData->PowerSupplies as $currentPowerSupply) {
+
+			$bayNumber = $currentPowerSupply->Oem->Hp->BayNumber;
+			$sortBase = $bayNumber * 10;
+
+			$powerSupplySerialNumber = new stdClass();
+			$powerSupplySerialNumber->Type = "String";
+			$powerSupplySerialNumber->Name = "Power Supply " . $bayNumber . " Serial Number";
+			$powerSupplySerialNumber->Ident = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "SerialNumber");
+			$powerSupplySerialNumber->Position = $sortBase + 0;
+			array_push($allVariables, $powerSupplySerialNumber);
+
+			$powerSupplyState = new stdClass();
+			$powerSupplyState->Type = "Boolean";
+			$powerSupplyState->Name = "Power Supply " . $bayNumber . " State";
+			$powerSupplyState->Ident = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "State");
+			$powerSupplyState->Position = $sortBase + 1;
+			$powerSupplyState->Profile = "HPEILO.HealthState";
+			$powerSupplyState->DefaultValue = false;
+			array_push($allVariables, $powerSupplyState);
+
+			$powerSupplyPower = new stdClass();
+			$powerSupplyPower->Type = "Float";
+			$powerSupplyPower->Name = "Power Supply " . $bayNumber . " Power";
+			$powerSupplyPower->Ident = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "Power");
+			$powerSupplyPower->Position = $sortBase + 2;
+			$powerSupplyPower->Profile = "~Watt.3680";
+			array_push($allVariables, $powerSupplyPower);
+
+			$powerSupplyPowerRating = new stdClass();
+			$powerSupplyPowerRating->Type = "Float";
+			$powerSupplyPowerRating->Name = "Power Supply " . $bayNumber . " Power Rating";
+			$powerSupplyPowerRating->Ident = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "PowerRating");
+			$powerSupplyPowerRating->Position = $sortBase + 3;
+			$powerSupplyPowerRating->Profile = "~Watt.3680";
+			array_push($allVariables, $powerSupplyPowerRating);
+
+			$powerSupplyVoltage = new stdClass();
+			$powerSupplyVoltage->Type = "Float";
+			$powerSupplyVoltage->Name = "Power Supply " . $bayNumber . " InputVoltage";
+			$powerSupplyVoltage->Ident = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "InputVoltage");
+			$powerSupplyVoltage->Position = $sortBase + 4;
+			$powerSupplyVoltage->Profile = "~Volt.230";
+			array_push($allVariables, $powerSupplyVoltage);
+		}
+
+		$this->MaintainDummyModule($this->ReadAttributeInteger("DummyModulePowerSupplies"), $allVariables);
 	}
 
 	protected function updateFans() {

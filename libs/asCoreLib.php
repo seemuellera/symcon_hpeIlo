@@ -120,10 +120,8 @@ class AsCoreLib extends IPSModule {
 	// Function to standardize Ident fom Variable text creation:
 	protected function generateIdent($variableDisplayName) {
 
-		$filterWhitespaces = preg_replace('/\s+/','',$variableDisplayName);
-		$filterDashes = preg_replace('/-+/','',$filterWhitespaces);
-		$filterSlashes = preg_replace('/\/+/','',$filterDashes);
-		return $filterSlashes;
+		$filteredIdent = preg_replace('/\W+/',"",$variableDisplayName);
+		return $filteredIdent;
 	}
 
 	// lookup Variable types

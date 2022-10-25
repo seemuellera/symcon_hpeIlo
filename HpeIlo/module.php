@@ -150,10 +150,19 @@ class HpeIlo extends AsCoreLib {
 
 	public function RefreshInformation() {
 
+		// Fetch all the data first
+		$result = $this->fetchIloData();
+
+		if (! $result) {
+
+			return false;
+		}
+
 		$this->updateFans();
 		$this->updateSystemHealth();
 		$this->updateThermalData();
 		$this->updatePowerInformation();
+		$this->updatePowerSupplies();
 	}
 
 	protected function fetchIloData() {
@@ -166,7 +175,7 @@ class HpeIlo extends AsCoreLib {
 		if (! $resultChassis) {
 			
 			$this->updateIloReachable(false);
-			return;
+			return false;
 		}
 		else {
 			
@@ -517,6 +526,42 @@ class HpeIlo extends AsCoreLib {
 			$displayNameSpeed = $currentFan->FanName . " Speed";
 			$identSpeed = preg_replace('/\s+/','',$displayNameSpeed);
 			$this->WriteValue($identSpeed, $currentFan->CurrentReading);
+		}
+	}
+
+	protected function updatePowerSupplies() {
+
+		if (! $this->powerData) {
+
+			$this->LogMessage("No Power Supply data found","DEBUG");
+			return;
+		}
+
+		foreach ($this->powerData->PowerSupplies as $currentPowerSupply) {
+
+			$bayNumber = $currentPowerSupply->Oem->Hp->BayNumber;
+
+			$identSerialNumber = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "SerialNumber");
+			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModulePowerSupplies"), $identSerialNumber, $currentPowerSupply->SerialNumber);
+
+			$identState = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "State");
+			if ($currentPowerSupply->Status->Health == "OK") {
+
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModulePowerSupplies"), $identState, true);
+			}
+			else {
+
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModulePowerSupplies"), $identState, false);
+			}
+
+			$identPower = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "Power");
+			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModulePowerSupplies"), $identPower, $currentPowerSupply->LastPowerOutputWatts);
+
+			$identPowerRating = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "PowerRating");
+			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModulePowerSupplies"), $identPowerRating, $currentPowerSupply->PowerCapacityWatts);
+
+			$identInputVoltage = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "InputVoltage");
+			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModulePowerSupplies"), $identInputVoltage, $currentPowerSupply->LineInputVoltage);
 		}
 	}
 

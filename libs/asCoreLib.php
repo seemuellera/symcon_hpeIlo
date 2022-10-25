@@ -242,5 +242,18 @@ class AsCoreLib extends IPSModule {
 			}
 		}
 	}
+
+	//Convenience Functions for dummy modules
+	protected function WriteDummyModuleValue($moduleId, $varIdent, $newValue) {
+
+		$variableId = @IPS_GetObjectIDByIdent($varIdent, $moduleId);
+		SetValue($variableId, $newValue);
+	}
+
+	protected function ReadDummyModuleValue($moduleId, $varIdent) {
+
+		$variableId = @IPS_GetObjectIDByIdent($varIdent, $moduleId);
+		return GetValue($variableId);
+	}
 }
 ?>

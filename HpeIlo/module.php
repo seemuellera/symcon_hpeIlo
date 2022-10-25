@@ -6,9 +6,9 @@ include_once __DIR__ . '/../libs/asCoreLib.php';
 class HpeIlo extends AsCoreLib {
 
 	// Global properties
-	protected $chassisData;
-	protected $thermalData;
-	protected $powerData;
+	public $chassisData;
+	public $thermalData;
+	public $powerData;
  
 	// Der Konstruktor des Moduls
 	// Überschreibt den Standard Kontruktor von IPS

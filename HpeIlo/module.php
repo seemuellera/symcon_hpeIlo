@@ -51,13 +51,6 @@ class HpeIlo extends AsCoreLib {
 		$this->RegisterVariableBoolean("Status","Status", "~Switch");
 		$this->RegisterVariableBoolean("IloCardReachable","ILO card reachable", "~Alert.Reversed");
 		$this->RegisterVariableBoolean("SystemHealth","System Health",$variableProfileHealthState);
-		$this->RegisterVariableFloat("TemperatureInlet","Temperature - Inlet","~Temperature");
-		$this->RegisterVariableFloat("TemperatureCpu1","Temperature - CPU 1","~Temperature");
-		$this->RegisterVariableFloat("TemperatureCpu2","Temperature - CPU 2","~Temperature");
-		$this->RegisterVariableFloat("TemperatureGpu","Temperature - GPU","~Temperature");
-		$this->RegisterVariableFloat("TemperaturePs1","Temperature - Power Supply 1","~Temperature");
-		$this->RegisterVariableFloat("TemperaturePs2","Temperature - Power Supply 2","~Temperature");
-		$this->RegisterVariableFloat("TemperatureSystemBoard","Temperature - System Board","~Temperature");
 		$this->RegisterVariableFloat("PowerConsumption","Power Consumption","~Watt.3680");
 		$this->RegisterVariableBoolean("PowerSupply1Health","Power Supply 1 Health", $variableProfileHealthState);
 		$this->RegisterVariableBoolean("PowerSupply2Health","Power Supply 2 Health", $variableProfileHealthState);
@@ -169,8 +162,6 @@ class HpeIlo extends AsCoreLib {
 		$this->updateTemperatureSensors();
 		$this->LogMessage("- Updating System Data","DEBUG");
 		$this->updateSystemHealth();
-		$this->LogMessage("- Updating Thermal","DEBUG");
-		$this->updateThermalData();
 		$this->LogMessage("- Updating Power consumption data","DEBUG");
 		$this->updatePowerInformation();
 		$this->LogMessage("- Updating Power supply data","DEBUG");
@@ -688,63 +679,6 @@ class HpeIlo extends AsCoreLib {
 
 			$identInputVoltage = $this->generateIdent("HpeIloPowerSupply" . $bayNumber . "InputVoltage");
 			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModulePowerSupplies"), $identInputVoltage, $currentPowerSupply->LineInputVoltage);
-		}
-	}
-
-	protected function updateThermalData() {
-		
-		$url = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
-		$result = $this->CallAPI("GET",$url);
-		
-		if (! $result) {
-			
-			$this->updateIloReachable(false);
-			return;
-		}
-		else {
-			
-			$this->updateIloReachable(true);
-		}
-
-		$resultObject = json_decode($result);
-		
-		foreach ($resultObject->Temperatures as $currentSensor) {
-
-			switch ($currentSensor->Name) {
-				case "01-Inlet Ambient":
-					SetValue($this->GetIDForIdent("TemperatureInlet"), $currentSensor->CurrentReading);
-					break;
-				case "01-Front Ambient":
-					SetValue($this->GetIDForIdent("TemperatureInlet"), $currentSensor->CurrentReading);
-					break;
-				case "02-CPU 1":
-					SetValue($this->GetIDForIdent("TemperatureCpu1"), $currentSensor->CurrentReading);
-					break;
-				case "03-CPU 2":
-					SetValue($this->GetIDForIdent("TemperatureCpu2"), $currentSensor->CurrentReading);
-					break;
-				case "19-PS 1 Internal":
-					SetValue($this->GetIDForIdent("TemperaturePs1"), $currentSensor->CurrentReading);
-					break;
-				case "15-P/S 1":
-					SetValue($this->GetIDForIdent("TemperaturePs1"), $currentSensor->CurrentReading);
-					break;
-				case "20-PS 2 Internal":
-					SetValue($this->GetIDForIdent("TemperaturePs2"), $currentSensor->CurrentReading);
-					break;
-				case "16-P/S 2":
-					SetValue($this->GetIDForIdent("TemperaturePs2"), $currentSensor->CurrentReading);
-					break;
-				case "25-PCI 5 GPU":
-					SetValue($this->GetIDForIdent("TemperatureGpu"), $currentSensor->CurrentReading);
-					break;
-				case "10-Chipset":
-					SetValue($this->GetIDForIdent("TemperatureSystemBoard"), $currentSensor->CurrentReading);
-					break;
-				case "13-Chipset":
-					SetValue($this->GetIDForIdent("TemperatureSystemBoard"), $currentSensor->CurrentReading);
-					break;
-			}
 		}
 	}
 	

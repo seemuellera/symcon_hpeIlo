@@ -150,18 +150,27 @@ class HpeIlo extends AsCoreLib {
 
 	public function RefreshInformation() {
 
+		$this->LogMessage("Data refresh was triggered","DEBUG");
+
 		// Fetch all the data first
+		$this->LogMessage("Fetching data from ILO API","DEBUG");
 		$result = $this->fetchIloData();
 
 		if (! $result) {
 
+			$this->LogMessage("Data could not be retrieved. Maybe the ILO card is offline","DEBUG");
 			return false;
 		}
 
+		$this->LogMessage("- Updating Fan data","DEBUG");
 		$this->updateFans();
+		$this->LogMessage("- Updating System Data","DEBUG");
 		$this->updateSystemHealth();
+		$this->LogMessage("- Updating Thermal","DEBUG");
 		$this->updateThermalData();
+		$this->LogMessage("- Updating Power consumption data","DEBUG");
 		$this->updatePowerInformation();
+		$this->LogMessage("- Updating Power supply data","DEBUG");
 		$this->updatePowerSupplies();
 	}
 
@@ -193,6 +202,8 @@ class HpeIlo extends AsCoreLib {
 		$urlPower = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Power";
 		$resultPower = $this->CallAPI("GET",$urlPower);
 		$this->powerData = json_decode($resultPower);
+
+		return true;
 	}
 	
 	public function PressPowerButton() {

@@ -30,6 +30,7 @@ class HpeIlo extends AsCoreLib {
 		$this->RegisterPropertyString("Sender","HpeIlo");
 		$this->RegisterPropertyInteger("RefreshInterval",0);
 		$this->RegisterPropertyString("hostname","");
+		$this->RegisterPropertyInteger("iloVersion", 4);
 		$this->RegisterPropertyBoolean("ignorePowerOn", false);
 		$this->RegisterPropertyBoolean("ignorePowerOff", false);
 		$this->RegisterPropertyBoolean("ignorePowerOnVoice", false);
@@ -122,6 +123,21 @@ class HpeIlo extends AsCoreLib {
 		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "hostname", "caption" => "Hostname or IP address");
 		$form['elements'][] = Array("type" => "ValidationTextBox", "name" => "ApiUsername", "caption" => "Username");
 		$form['elements'][] = Array("type" => "PasswordTextBox", "name" => "ApiPassword", "caption" => "Password");
+		$form['elements'][] = Array(
+			"type" => "Select", 
+			"name" => "iloVersion", 
+			"caption" => "Select the ILO version",
+			"options" => Array(
+				Array(
+					"caption" => "ILO 4",
+					"value" => "4"
+				),
+				Array(
+					"caption" => "ILO 5",
+					"value" => "5"
+				)
+			)
+		);
 		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOn", "caption" => "Ignore Power On events via Web Interface");
 		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOff", "caption" => "Ignore Power Off events via Web Interface");
 		$form['elements'][] = Array("type" => "CheckBox", "name" => "ignorePowerOnVoice", "caption" => "Ignore Power On events via Voice Assistant");

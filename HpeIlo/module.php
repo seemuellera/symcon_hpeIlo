@@ -722,14 +722,8 @@ class HpeIlo extends AsCoreLib {
 			return;
 		}
 
-		if ($this->ReadPropertyInteger("iloVersion") == 5) {
-
-			$this->WriteValue("PowerConsumption", $this->powerData->PowerControl[0]->PowerConsumedWatts);
-		}
-		else {
-
-			$this->WriteValue("PowerConsumption", $this->powerData->PowerConsumedWatts);
-		}
+		$powerConsumed = $this->powerData->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['powerConsumed']};
+		$this->WriteValue("PowerConsumption", $powerConsumed);
 	}
 	
 	protected function updateIloReachable($newState) {

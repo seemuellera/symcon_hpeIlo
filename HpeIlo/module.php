@@ -21,17 +21,17 @@ class HpeIlo extends AsCoreLib {
         parent::__construct($InstanceID);
  
         // Selbsterstellter Code
-		$this->$urlTable = Array();
+		$this->urlTable = Array();
+		$this->urlTable[4]['chassis'] = '/rest/v1/Chassis/1';
+		$this->urlTable[5]['chassis'] = '/redfish/v1/Chassis/1';
+		$this->urlTable[4]['thermal'] = '/rest/v1/Chassis/1/Thermal';
+		$this->urlTable[5]['thermal'] = '/redfish/v1/Chassis/1/Thermal';
+		$this->urlTable[4]['power'] = '/rest/v1/Chassis/1/Power';
+		$this->urlTable[5]['power'] = '/redfish/v1/Chassis/1/Power';
+		$this->urlTable[4]['reset'] = '/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/';
+		$this->urlTable[5]['reset'] = '/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/';
 
-		$this->$urlTable[4]['chassis'] = '/rest/v1/Chassis/1';
-		$this->$urlTable[5]['chassis'] = '/redfish/v1/Chassis/1';
-		$this->$urlTable[4]['thermal'] = '/rest/v1/Chassis/1/Thermal';
-		$this->$urlTable[5]['thermal'] = '/redfish/v1/Chassis/1/Thermal';
-		$this->$urlTable[4]['power'] = '/rest/v1/Chassis/1/Power';
-		$this->$urlTable[5]['power'] = '/redfish/v1/Chassis/1/Power';
-		$this->$urlTable[4]['reset'] = '/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/';
-		$this->$urlTable[5]['reset'] = '/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/';
-
+		$this->attributeTable = Array();
 		$this->attributeTable[4]['fanName'] = 'FanName';
 		$this->attributeTable[5]['fanName'] = 'Name';
     }

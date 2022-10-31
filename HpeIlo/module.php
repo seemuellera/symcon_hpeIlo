@@ -600,7 +600,15 @@ class HpeIlo extends AsCoreLib {
 			}
 
 			$identSpeed = $this->generateIdent("HpeIloFan" . $fanName . "Speed");
-			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identSpeed, $currentFan->CurrentReading);
+
+			if ($this->ReadPropertyInteger("iloVersion") == 5) {
+			
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identSpeed, $currentFan->Reading);
+			}
+			else {
+
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identSpeed, $currentFan->CurrentReading);
+			}
 		}
 	}
 

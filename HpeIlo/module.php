@@ -42,9 +42,6 @@ class HpeIlo extends AsCoreLib {
 		$this->attributeTable[5]['sensorNumber'] = 'SensorNumber';
 		$this->attributeTable[4]['sensorReading'] = 'CurrentReading';
 		$this->attributeTable[5]['sensorReading'] = 'ReadingCelsius';
-		$this->attributeTable[4]['powerConsumed'] = 'PowerConsumedWatts';
-		$this->attributeTable[5]['powerConsumed'] = 'PowerControl[0]->PowerConsumedWatts';
-		
     }
  
     // Überschreibt die interne IPS_Create($id) Funktion
@@ -722,7 +719,7 @@ class HpeIlo extends AsCoreLib {
 			return;
 		}
 
-		$powerConsumed = $this->powerData->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['powerConsumed']};
+		$powerConsumed = $this->powerData->PowerControl[0]->PowerConsumedWatts;
 		$this->WriteValue("PowerConsumption", $powerConsumed);
 	}
 	

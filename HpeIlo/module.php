@@ -420,7 +420,14 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->thermalData->Fans as $currentFan) {
 
-			$fanName = $currentFan->FanName;
+			if ($this->ReadPropertyInteger("iloVersion") == 5) {
+
+				$fanName = $currentFan->Name;	
+			}
+			else {
+
+				$fanName = $currentFan->FanName;
+			}
 			preg_match('/Fan (\d+)/', $fanName, $matches);
 			$fanId = $matches[1][0];
 			$sortBase = $fanId * 10;
@@ -571,7 +578,14 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->thermalData->Fans as $currentFan) {
 
-			$fanName = $currentFan->FanName;
+			if ($this->ReadPropertyInteger("iloVersion") == 5) {
+
+				$fanName = $currentFan->Name;
+			}
+			else {
+			
+				$fanName = $currentFan->FanName;
+			}
 
 			$this->LogMessage("Fan update: updating fan $fanName","DEBUG");
 

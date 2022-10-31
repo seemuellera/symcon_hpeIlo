@@ -762,7 +762,15 @@ class HpeIlo extends AsCoreLib {
 			$this->LogMessage("No Power Data found","DEBUG");
 			return;
 		}
-		$this->WriteValue("PowerConsumption", $this->powerData->PowerConsumedWatts);
+
+		if ($this->ReadPropertyInteger("iloVersion") == 5) {
+
+			$this->WriteValue("PowerConsumption", $this->powerData->PowerControl[0]->PowerConsumedWatts);
+		}
+		else {
+
+			$this->WriteValue("PowerConsumption", $this->powerData->PowerConsumedWatts);
+		}
 	}
 	
 	protected function updateIloReachable($newState) {

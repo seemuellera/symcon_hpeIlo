@@ -414,7 +414,7 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->thermalData->Fans as $currentFan) {
 
-			$fanName = $currentFan->$this->attributeTable[4]['fanName'];
+			$fanName = $currentFan->{$this->attributeTable[4]['fanName']};
 
 			preg_match('/Fan (\d+)/', $fanName, $matches);
 			$fanId = $matches[1][0];

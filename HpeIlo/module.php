@@ -40,8 +40,8 @@ class HpeIlo extends AsCoreLib {
 		$this->attributeTable[5]['powerManufacturer'] = 'Hpe';
 		$this->attributeTable[4]['sensorNumber'] = 'Number';
 		$this->attributeTable[5]['sensorNumber'] = 'SensorNumber';
-		$this->attributeTable[4]['sensorReading'] = 'ReadingCelcius';
-		$this->attributeTable[5]['sensorReading'] = 'CurrentReading';
+		$this->attributeTable[4]['sensorReading'] = 'CurrentReading';
+		$this->attributeTable[5]['sensorReading'] = 'ReadingCelcius';
     }
  
     // Überschreibt die interne IPS_Create($id) Funktion

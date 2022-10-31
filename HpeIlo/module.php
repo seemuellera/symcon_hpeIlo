@@ -9,6 +9,9 @@ class HpeIlo extends AsCoreLib {
 	protected $chassisData;
 	protected $thermalData;
 	protected $powerData;
+
+	protected $urlTable;
+	protected $attributeTable;
  
 	// Der Konstruktor des Moduls
 	// Überschreibt den Standard Kontruktor von IPS
@@ -18,6 +21,19 @@ class HpeIlo extends AsCoreLib {
         parent::__construct($InstanceID);
  
         // Selbsterstellter Code
+		$this->$urlTable = Array();
+
+		$this->$urlTable[4]['chassis'] = '/rest/v1/Chassis/1';
+		$this->$urlTable[5]['chassis'] = '/redfish/v1/Chassis/1';
+		$this->$urlTable[4]['thermal'] = '/rest/v1/Chassis/1/Thermal';
+		$this->$urlTable[5]['thermal'] = '/redfish/v1/Chassis/1/Thermal';
+		$this->$urlTable[4]['power'] = '/rest/v1/Chassis/1/Power';
+		$this->$urlTable[5]['power'] = '/redfish/v1/Chassis/1/Power';
+		$this->$urlTable[4]['reset'] = '/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/';
+		$this->$urlTable[5]['reset'] = '/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/';
+
+		$this->attributeTable[4]['fanName'] = 'FanName';
+		$this->attributeTable[5]['fanName'] = 'Name';
     }
  
     // Überschreibt die interne IPS_Create($id) Funktion
@@ -183,15 +199,7 @@ class HpeIlo extends AsCoreLib {
 	protected function fetchIloData() {
 
 		// Chassis Data
-		// Update: Added version switch via if for viability testing. Needs to be replaced with a proper lookup table later
-		if ($this->ReadPropertyInteger("iloVersion") == 5) {
-
-			$urlChassis = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Chassis/1";
-		}
-		else {
-
-			$urlChassis = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1";
-		}
+		$urlChassis = "https://" . $this->ReadPropertyString("hostname") . $this->urlTable[$this->ReadPropertyInteger("iloVersion")]['chassis'];
 		$resultChassis = $this->CallAPI("GET",$urlChassis);
 		
 		// Check reachability on the first run
@@ -208,26 +216,12 @@ class HpeIlo extends AsCoreLib {
 		$this->chassisData = json_decode($resultChassis);
 
 		// Termal data
-		if ($this->ReadPropertyInteger("iloVersion") == 5) {
-
-			$urlThermal = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Chassis/1/Thermal";
-		}
-		else {
-
-			$urlThermal = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
-		}
+		$urlThermal = "https://" . $this->ReadPropertyString("hostname") . $this->urlTable[$this->ReadPropertyInteger("iloVersion")]['thermal'];
 		$resultThermal = $this->CallAPI("GET",$urlThermal);
 		$this->thermalData = json_decode($resultThermal);
 
 		// Power data
-		if ($this->ReadPropertyInteger("iloVersion") == 5) {
-
-			$urlPower = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Chassis/1/Power";
-		}
-		else {
-
-			$urlPower = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Power";
-		}
+		$urlPower = "https://" . $this->ReadPropertyString("hostname") . $this->urlTable[$this->ReadPropertyInteger("iloVersion")]['power'];
 		$resultPower = $this->CallAPI("GET",$urlPower);
 		$this->powerData = json_decode($resultPower);
 
@@ -236,7 +230,7 @@ class HpeIlo extends AsCoreLib {
 	
 	public function PressPowerButton() {
 		
-		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
+		$url = "https://" . $this->ReadPropertyString("hostname") . $this->urlTable[$this->ReadPropertyInteger("iloVersion")]['reset'];
 		$dataJson = '{"ResetType": "PushPowerButton"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
 		
@@ -256,7 +250,7 @@ class HpeIlo extends AsCoreLib {
 
 	public function ForcePowerOff() {
 		
-		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
+		$url = "https://" . $this->ReadPropertyString("hostname") . $this->urlTable[$this->ReadPropertyInteger("iloVersion")]['reset'];
 		$dataJson = '{"ResetType": "ForceOff"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
 		
@@ -277,7 +271,7 @@ class HpeIlo extends AsCoreLib {
 	
 	public function ForcePowerOn() {
 		
-		$url = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Systems/1/Actions/ComputerSystem.Reset/";
+		$url = "https://" . $this->ReadPropertyString("hostname") . $this->urlTable[$this->ReadPropertyInteger("iloVersion")]['reset'];
 		$dataJson = '{"ResetType": "On"}';
 		$resultObjectReset = $this->CallAPI("POST", $url, $dataJson);
 		
@@ -420,14 +414,8 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->thermalData->Fans as $currentFan) {
 
-			if ($this->ReadPropertyInteger("iloVersion") == 5) {
+			$fanName = $currentFan->$this->attributeTable[4]['fanName'];
 
-				$fanName = $currentFan->Name;	
-			}
-			else {
-
-				$fanName = $currentFan->FanName;
-			}
 			preg_match('/Fan (\d+)/', $fanName, $matches);
 			$fanId = $matches[1][0];
 			$sortBase = $fanId * 10;

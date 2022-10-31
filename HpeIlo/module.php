@@ -519,7 +519,14 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->powerData->PowerSupplies as $currentPowerSupply) {
 
-			$bayNumber = $currentPowerSupply->Oem->Hp->BayNumber;
+			if ($this->ReadPropertyInteger("iloVersion") == 5) {
+
+				$bayNumber = $currentPowerSupply->Oem->Hpe->BayNumber;
+			}
+			else {
+			
+				$bayNumber = $currentPowerSupply->Oem->Hp->BayNumber;
+			}
 			$sortBase = $bayNumber * 10;
 
 			$powerSupplySerialNumber = new stdClass();
@@ -664,7 +671,14 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->powerData->PowerSupplies as $currentPowerSupply) {
 
-			$bayNumber = $currentPowerSupply->Oem->Hp->BayNumber;
+			if ($this->ReadPropertyInteger("iloVersion") == 5) {
+
+				$bayNumber = $currentPowerSupply->Oem->Hpe->BayNumber;
+			}
+			else {
+			
+				$bayNumber = $currentPowerSupply->Oem->Hp->BayNumber;
+			}
 
 			$this->LogMessage("Power supply update: updating Powersupply in bay number $bayNumber","DEBUG");
 

@@ -34,6 +34,14 @@ class HpeIlo extends AsCoreLib {
 		$this->attributeTable = Array();
 		$this->attributeTable[4]['fanName'] = 'FanName';
 		$this->attributeTable[5]['fanName'] = 'Name';
+		$this->attributeTable[4]['fanSpeed'] = 'CurrentReading';
+		$this->attributeTable[5]['fanSpeed'] = 'Reading';
+		$this->attributeTable[4]['powerManufacturer'] = 'Hp';
+		$this->attributeTable[5]['powerManufacturer'] = 'Hpe';
+		$this->attributeTable[4]['sensorNumber'] = 'Number';
+		$this->attributeTable[5]['sensorNumber'] = 'SensorNumber';
+		$this->attributeTable[4]['sensorReading'] = 'ReadingCelcius';
+		$this->attributeTable[5]['sensorReading'] = 'CurrentReading';
     }
  
     // Überschreibt die interne IPS_Create($id) Funktion
@@ -462,16 +470,9 @@ class HpeIlo extends AsCoreLib {
 			}
 
 			$sensorName = $currentTemperature->Name;
+			$sensorNumber = $currentTemperature->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['sensorNumber']};
+			$sortBase = $sensorNumber * 10;
 
-			if ($this->ReadPropertyInteger("iloVersion") == 5) {
-
-				$sortBase = $currentTemperature->SensorNumber * 10;
-			}
-			else {
-			
-				$sortBase = $currentTemperature->Number * 10;
-			}
-			
 			$sensorTemperature = new stdClass();
 			$sensorTemperature->Type = "Float";
 			$sensorTemperature->Name = "$sensorName Current Temperature";
@@ -515,14 +516,7 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->powerData->PowerSupplies as $currentPowerSupply) {
 
-			if ($this->ReadPropertyInteger("iloVersion") == 5) {
-
-				$bayNumber = $currentPowerSupply->Oem->Hpe->BayNumber;
-			}
-			else {
-			
-				$bayNumber = $currentPowerSupply->Oem->Hp->BayNumber;
-			}
+			$bayNumber = $currentPowerSupply->Oem->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['powerManufacturer']}->BayNumber;
 			$sortBase = $bayNumber * 10;
 
 			$powerSupplySerialNumber = new stdClass();
@@ -581,14 +575,7 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->thermalData->Fans as $currentFan) {
 
-			if ($this->ReadPropertyInteger("iloVersion") == 5) {
-
-				$fanName = $currentFan->Name;
-			}
-			else {
-			
-				$fanName = $currentFan->FanName;
-			}
+			$fanName = $currentFan->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['fanName']};
 
 			$this->LogMessage("Fan update: updating fan $fanName","DEBUG");
 
@@ -603,15 +590,9 @@ class HpeIlo extends AsCoreLib {
 			}
 
 			$identSpeed = $this->generateIdent("HpeIloFan" . $fanName . "Speed");
+			$fanSpeed = $currentFan->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['fanSpeed']};
 
-			if ($this->ReadPropertyInteger("iloVersion") == 5) {
-			
-				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identSpeed, $currentFan->Reading);
-			}
-			else {
-
-				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identSpeed, $currentFan->CurrentReading);
-			}
+			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleFans"), $identSpeed, $fanSpeed);
 		}
 	}
 
@@ -648,14 +629,8 @@ class HpeIlo extends AsCoreLib {
 			}
 
 			$identCurrentTemperature = $this->generateIdent("HpeIloTemperature" . $sensorName . "CurrentTemperature");
-			if ($this->ReadPropertyInteger("iloVersion") == 5) {
-			
-				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCurrentTemperature, $currentTemperature->ReadingCelsius);
-			}
-			else {
-
-				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCurrentTemperature, $currentTemperature->CurrentReading);
-			}
+			$temperature = $currentTemperature->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['sensorReading']};
+			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCurrentTemperature, $temperature);
 
 			$identCriticalTemperature = $this->generateIdent("HpeIloTemperature" . $sensorName . "CriticalTemperature");
 			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCriticalTemperature, $currentTemperature->UpperThresholdCritical);
@@ -674,14 +649,7 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->powerData->PowerSupplies as $currentPowerSupply) {
 
-			if ($this->ReadPropertyInteger("iloVersion") == 5) {
-
-				$bayNumber = $currentPowerSupply->Oem->Hpe->BayNumber;
-			}
-			else {
-			
-				$bayNumber = $currentPowerSupply->Oem->Hp->BayNumber;
-			}
+			$bayNumber = $currentPowerSupply->Oem->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['powerManufacturer']}->BayNumber;
 
 			$this->LogMessage("Power supply update: updating Powersupply in bay number $bayNumber","DEBUG");
 

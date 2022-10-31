@@ -122,12 +122,6 @@ class HpeIlo extends AsCoreLib {
 			$this->WriteAttributeInteger("DummyModuleTemperatureSensors", $dummyModuleTemperatureSensorsId);
 		}
 
-		$this->fetchIloData();
-
-		$this->detectFans();
-		$this->detectTemperatureSensors();
-		$this->detectPowerSupplies();
-
        	// Diese Zeile nicht löschen
        	parent::ApplyChanges();
     }
@@ -405,6 +399,15 @@ class HpeIlo extends AsCoreLib {
 				"Number of Temperature Sensors: " . $this->getNumberOfTemperatureSensors();
 
 		echo $text;
+	}
+
+	public function DetectHardware() {
+	
+		$this->fetchIloData();
+
+		$this->detectFans();
+		$this->detectTemperatureSensors();
+		$this->detectPowerSupplies();
 	}
 
 	

@@ -489,7 +489,7 @@ class HpeIlo extends AsCoreLib {
 			$sensorState->Type = "Boolean";
 			$sensorState->Name = "$sensorName State";
 			$sensorState->Ident = $this->generateIdent("HpeIloTemperature" . $sensorName . "State");
-			$sensorState->Position = $sortBase + 1;
+			$sensorState->Position = $sortBase + 2;
 			$sensorState->Profile = "HPEILO.HealthState";
 			$sensorState->DefaultValue = false;
 			array_push($allVariables, $sensorState);
@@ -498,7 +498,7 @@ class HpeIlo extends AsCoreLib {
 			$sensorCriticalTemperature->Type = "Float";
 			$sensorCriticalTemperature->Name = "$sensorName Critical Temperature";
 			$sensorCriticalTemperature->Ident = $this->generateIdent("HpeIloTemperature" . $sensorName . "CriticalTemperature");
-			$sensorCriticalTemperature->Position = $sortBase + 2;
+			$sensorCriticalTemperature->Position = $sortBase + 1;
 			$sensorCriticalTemperature->Profile = "~Temperature";
 			array_push($allVariables, $sensorCriticalTemperature);
 		}

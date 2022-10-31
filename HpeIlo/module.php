@@ -183,7 +183,15 @@ class HpeIlo extends AsCoreLib {
 	protected function fetchIloData() {
 
 		// Chassis Data
-		$urlChassis = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1";
+		// Update: Added version switch via if for viability testing. Needs to be replaced with a proper lookup table later
+		if ($this->ReadPropertyInteger("iloVersion") == 5) {
+
+			$urlChassis = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Chassis/1";
+		}
+		else {
+
+			$urlChassis = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1";
+		}
 		$resultChassis = $this->CallAPI("GET",$urlChassis);
 		
 		// Check reachability on the first run
@@ -200,12 +208,26 @@ class HpeIlo extends AsCoreLib {
 		$this->chassisData = json_decode($resultChassis);
 
 		// Termal data
-		$urlThermal = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
+		if ($this->ReadPropertyInteger("iloVersion") == 5) {
+
+			$urlThermal = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Chassis/1/Thermal";
+		}
+		else {
+
+			$urlThermal = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Thermal";
+		}
 		$resultThermal = $this->CallAPI("GET",$urlThermal);
 		$this->thermalData = json_decode($resultThermal);
 
 		// Power data
-		$urlPower = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Power";
+		if ($this->ReadPropertyInteger("iloVersion") == 5) {
+
+			$urlPower = "https://" . $this->ReadPropertyString("hostname") . "/redfish/v1/Chassis/1/Power";
+		}
+		else {
+
+			$urlPower = "https://" . $this->ReadPropertyString("hostname") . "/rest/v1/Chassis/1/Power";
+		}
 		$resultPower = $this->CallAPI("GET",$urlPower);
 		$this->powerData = json_decode($resultPower);
 

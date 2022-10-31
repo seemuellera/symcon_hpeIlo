@@ -474,7 +474,15 @@ class HpeIlo extends AsCoreLib {
 			}
 
 			$sensorName = $currentTemperature->Name;
-			$sortBase = $currentTemperature->Number * 10;
+
+			if ($this->ReadPropertyInteger("iloVersion") == 5) {
+
+				$sortBase = $currentTemperature->SensorNumber * 10;
+			}
+			else {
+			
+				$sortBase = $currentTemperature->Number * 10;
+			}
 			
 			$sensorTemperature = new stdClass();
 			$sensorTemperature->Type = "Float";
@@ -652,7 +660,14 @@ class HpeIlo extends AsCoreLib {
 			}
 
 			$identCurrentTemperature = $this->generateIdent("HpeIloTemperature" . $sensorName . "CurrentTemperature");
-			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCurrentTemperature, $currentTemperature->CurrentReading);
+			if ($this->ReadPropertyInteger("iloVersion") == 5) {
+			
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCurrentTemperature, $currentTemperature->ReadingCelsius);
+			}
+			else {
+
+				$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCurrentTemperature, $currentTemperature->CurrentReading);
+			}
 
 			$identCriticalTemperature = $this->generateIdent("HpeIloTemperature" . $sensorName . "CriticalTemperature");
 			$this->WriteDummyModuleValue($this->ReadAttributeInteger("DummyModuleTemperatureSensors"), $identCriticalTemperature, $currentTemperature->UpperThresholdCritical);

@@ -130,11 +130,11 @@ class HpeIlo extends AsCoreLib {
 			"options" => Array(
 				Array(
 					"caption" => "ILO 4",
-					"value" => "4"
+					"value" => 4
 				),
 				Array(
 					"caption" => "ILO 5",
-					"value" => "5"
+					"value" => 5
 				)
 			)
 		);

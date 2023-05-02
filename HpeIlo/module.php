@@ -428,6 +428,13 @@ class HpeIlo extends AsCoreLib {
 
 			$fanName = $currentFan->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['fanName']};
 
+			// Skip absent Fans
+			if ($currentFan->Status->State == "Absent") {
+
+				$this->LogMessage("Skipping Fan  $fanName as it is not installed","DEBUG");
+				continue;
+			}
+
 			preg_match('/Fan (\d+)/', $fanName, $matches);
 			$fanId = $matches[1][0];
 			$sortBase = $fanId * 10;
@@ -580,8 +587,14 @@ class HpeIlo extends AsCoreLib {
 		foreach ($this->thermalData->Fans as $currentFan) {
 
 			$fanName = $currentFan->{$this->attributeTable[$this->ReadPropertyInteger("iloVersion")]['fanName']};
-
 			$this->LogMessage("Fan update: updating fan $fanName","DEBUG");
+
+			// Skip absent Fans
+			if ($currentFan->Status->State == "Absent") {
+
+				$this->LogMessage("Skipping Fan  $fanName as it is not installed","DEBUG");
+				continue;
+			}
 
 			$identState = $this->generateIdent("HpeIloFan" . $fanName . "State");
 			if ($currentFan->Status->Health == "OK") {

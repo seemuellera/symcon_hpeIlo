@@ -474,6 +474,12 @@ class HpeIlo extends AsCoreLib {
 
 		foreach ($this->thermalData->Temperatures as $currentTemperature) {
 
+			// Skip the sensor if Status property is empty
+			if (! has_property($currentTemperature->Status, "State")) {
+
+				continue;
+			}
+
 			// Skip the sensor if absent
 			if ($currentTemperature->Status->State == "Absent") {
 
@@ -624,6 +630,12 @@ class HpeIlo extends AsCoreLib {
 		$this->LogMessage("Temperature Sensor update: found " . count($this->thermalData->Temperatures) . " sensors","DEBUG");
 
 		foreach ($this->thermalData->Temperatures as $currentTemperature) {
+
+			// Skip the sensor if the Status property is empty
+			if (! has_property($currentTemperature->Status, "State")) {
+
+				continue;
+			}
 
 			// Skip the sensor if absent
 			if ($currentTemperature->Status->State == "Absent") {
